@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import MeetingCalendar from "./components/MeetingCalendar"
 import Meeting from "./components/Meeting";
+import email from "./components/email";
 
 function App() {
     return (
