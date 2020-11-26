@@ -1,21 +1,20 @@
-import React, {Component} from "react";
-import TeamMembers from "../components/TeamMembers";
-import DisplayData from "../components/DisplayData";
-import db from "../base"
-import "../App.css"
+import React, {Component} from 'react';
+import MeetingCalendar from '../components/MeetingCalendar.js';
+import db from '../base';
+import Meeting from "../components/Meeting";
 
-const Home=() =>{
 
-        return (
+const Home = () => {
+    return (
+
+        <div>
+            <h1>Home</h1>
             <div>
-                <h1>Home</h1>
-                <div className="centered">
-                    <TeamMembers />
-                    <DisplayData />
-                 </div>
-                <button onClick={() => db.auth().signOut()}>SignOut</button>
+                <Meeting/>
+                <MeetingCalendar/>
             </div>
-        )
+        </div>
+    )
 };
 
 export default Home;
