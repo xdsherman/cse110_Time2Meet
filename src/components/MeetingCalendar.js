@@ -83,13 +83,17 @@ class MeetingCalendar extends Component {
                 <button className="create" onClick={this.handleCreate}>Create Another Meeting</button>
             
                 <TabularView 
-                    usernameList={["Calvin", "Calvin2"]} 
+                    usernameList={["Calvin", "Calvin2"]}
                     emailList={["cac006@ucsd.edu", "moistbanana123@gmail.com"]} 
                     meetingName={"Team Meeting"} 
                     meetingDate1={"12/12/2020 3PM"}
                     meetingDate2={"12/13/2020 5PM"}
                     meetingDate3={"12/10/2020 11AM"}
-                    meetingDecided={false}
+                    decided={false}
+                    userID="xx"
+                    meetingCreatorID="xx"
+                    setDate=""
+                    setTime=""
                 />
             </div>
         );

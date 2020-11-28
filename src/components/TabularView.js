@@ -11,8 +11,11 @@ class TabularView extends Component {
             meetingDate2: this.props.meetingDate2,
             meetingDate3: this.props.meetingDate3,
 
-            // probably extract this from the database
-            meetingDecided: this.props.meetingDecided
+            userID: this.props.userID,
+            meetingCreatorID: this.props.meetingCreatorID,
+            decided: this.props.decided,
+            setDate: this.props.setDate,
+            setTime: this.props.setTime
         }
     }
 
@@ -47,12 +50,21 @@ class TabularView extends Component {
     }
 
     render() {
-        // if meeting has been decided, don't show the table
         var content;
-        if (this.state.meetingDecided === true) {
-            content = "Meeting has been scheduled already";
+        // if meeting has been decided, don't show the table
+        if (this.state.decided === true) {
+            content = `This meeting has been scheduled for ${this.state.setDate} at ${this.state.setTime}.`;
         }
-        // else show the table and add set meeting buttons
+        // else if user is not the meeting creator, don't show the buttons
+        else if (this.props.userID !== this.props.meetingCreatorID) {
+            content = 
+                <ul>
+                    <li>{this.state.meetingDate1}</li>
+                    <li>{this.state.meetingDate2}</li>
+                    <li>{this.state.meetingDate3}</li>
+                </ul>
+        }
+        // else the user is the meeting creator, then show the table and set meeting buttons
         else {
             content = 
                 <ul>
