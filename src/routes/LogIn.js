@@ -25,7 +25,17 @@ const Login = ({history}) => {
         try{
             db
                 .auth()
-                .signInWithPopup(provider2);
+                .signInWithPopup(provider2).then(function(user){
+                    if (user.additionalUserInfo.isNewUser){
+                db.database().ref("UserInfo").child(db.auth().currentUser.uid).set({
+                    id: db.auth().currentUser.uid,
+                    name: db.auth().currentUser.displayName,//db.auth().currentUser.displayName,
+                    email: db.auth().currentUser.email,//db.auth().currentUser.email
+                    meeting: []
+                })}
+            }).catch(function(error) {
+                alert(error);
+            });
             history.push("/");
         } catch (error){
             alert(error);
