@@ -5,20 +5,36 @@ import '../App.css';
 const SignUp = ({ history }) => {
 
     const handleSignUp = (event) => {
-        console.log("Hello");
         event.preventDefault();
-        const { email, password } = event.target.elements;
-
+        const { email, password,preferred_name } = event.target.elements;
         try{
             db
                 .auth()
                 .createUserWithEmailAndPassword(email.value,
-                    password.value);
+                    password.value).then(function(user){
+                        db.auth().currentUser.updateProfile({
+                    displayName: preferred_name.value
+                });
+
+                db.database().ref("UserInfo").child(db.auth().currentUser.uid).set({
+                    id: db.auth().currentUser.uid,
+                    name: preferred_name.value,//db.auth().currentUser.displayName,
+                    email: db.auth().currentUser.email,//db.auth().currentUser.email
+                    //meeting: []
+                })
+                    }).catch(function(error) {
+               console.log(error);
+            });
             history.push("/");
+
+
+
         } catch(error){
             alert(error);
         }
     }
+
+
 
     const redirectLogIn = () =>{
         history.push("/")
@@ -37,7 +53,7 @@ const SignUp = ({ history }) => {
                 </label>
                 <label>
                     Preferred Name
-                    <input name="preffered_name" type="preferred_name" placeholder="Preferred name" />
+                    <input name="preferred_name" type="preferred_name" placeholder="Preferred name" />
                 </label>
                 <button type="submit" > Sign Up</button>
                 </form>
