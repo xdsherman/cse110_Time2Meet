@@ -7,12 +7,12 @@ import Meeting from "./components/Meeting";
 
 function App() {
     return (
-            <Router>
-                <div>
-                    <Route exact path="/calendar" component={MeetingCalendar} />
-                    <Route exact path="/" component={Meeting} />
-                </div>
-            </Router>
+        <Router>
+            <div>
+                <Route exact path="/calendar" component={MeetingCalendar} />
+                <Route exact path="/" component={Meeting} />
+            </div>
+        </Router>
     );
 }
 

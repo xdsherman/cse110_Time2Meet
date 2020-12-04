@@ -4,15 +4,10 @@ import db from '../base';
 import Meeting from "../components/Meeting";
 //import email from "../components/Email";
 
-
 const Home = () => {
     return (
         <div>
             <h1>Home</h1>
-            <div>
-                <Meeting/>
-                <MeetingCalendar/>
-            </div>
         </div>
     )
 };

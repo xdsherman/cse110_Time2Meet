@@ -1,25 +1,96 @@
 import React, {Component} from 'react';
+import db from '../base';
 
 class TabularView extends Component {
     constructor(state) {
         super(state)
         this.state = {
+            meetingID: this.props.meetingID,
             usernameList: this.props.usernameList,
             emailList: this.props.emailList,
             meetingName: this.props.meetingName,
-            meetingDate1: this.props.meetingDate1,
-            meetingDate2: this.props.meetingDate2,
-            meetingDate3: this.props.meetingDate3,
 
             userID: this.props.userID,
             meetingCreatorID: this.props.meetingCreatorID,
-            decided: this.props.decided,
-            setDate: this.props.setDate,
-            setTime: this.props.setTime
+
+            meetingData: [],
+
+            // for calculating top 3 suggested meetingtimes
+            availabilities: {},
+            bestTimes: []
         }
+        
+        this.firebaseMeetingsRef = db.database().ref("meetings/"+this.state.meetingID);
+        this.firebaseAvailabilitiesRef = db.database().ref("availability/"+this.state.meetingID);
+    }
+    componentWillUnmount() {
+        this.firebaseMeetingsRef.off();
+        this.firebaseAvailabilitiesRef.off();
+    }
+    componentDidMount() {
+        // read meeting table in database
+        this.firebaseMeetingsRef.on('value', (snapshot) => {
+            this.setState({
+                meetingData: snapshot.val()
+            });
+        });
+
+        // calculate top 3 times
+        this.firebaseAvailabilitiesRef.on('value', (snapshot)=> {
+            let avaArray = {};
+            if (snapshot.val() != null) {
+                for (const [user,ava] of Object.entries(snapshot.val())) {
+                    for (const each of Object.values(ava.availability)) {
+                        let key = each.day + ' ' + this.convertTo12Hr(each.hour);
+                        if (avaArray[key] === undefined) {
+                            avaArray[key] = {}
+                            avaArray[key]["priority"] = each.priority;
+                            avaArray[key]["users"] = [user];
+                        } else {
+                            avaArray[key]["priority"] += each.priority;
+                            avaArray[key]["users"].push(user);
+                        }
+                    }
+                }
+                var sortable = [];
+                for (let key in avaArray) {
+                    sortable.push([key, avaArray[key]["priority"]]);
+                }
+                sortable.sort(function (a, b) {
+                    return b[1] - a[1];
+                });
+                sortable = sortable.slice(0, 3);
+                var bestTimes = [];
+                for (let key in sortable) {
+                    bestTimes.push(sortable[key][0]);
+                }
+                this.setState({
+                    bestTimes: bestTimes,
+                    availabilities: avaArray
+                })
+            }
+        });
+    }
+
+    convertTo12Hr(hour) {
+        var AMPM = (hour < 12) ? "AM" : "PM";
+        var h = (hour % 12) || 12;
+        return h + AMPM;
     }
 
     sendEmail(selectedDate) {
+        var split = selectedDate.split(' ');
+        var date = split[0];
+        var time = split[1];
+        // set the date and time in the database
+        db.database().ref('meetings/' + this.state.meetingID).update({
+            decided: true,
+            setDate: date,
+            setTime: time
+        });
+
+        // uncomment this for email functionality
+        /*
         // send emails to each user in the meeting through emailjs API
         for (let i = 0; i < this.state.usernameList.length; i++) {
             // create http post request
@@ -47,53 +118,57 @@ class TabularView extends Component {
             }
             http.send(JSON.stringify(data));
         }
+        */
     }
-
+    
     render() {
-        var content;
+        var meeting1, meeting2, meeting3;
+
         // if meeting has been decided, don't show the table
-        if (this.state.decided === true) {
-            content = `This meeting has been scheduled for ${this.state.setDate} at ${this.state.setTime}.`;
+        if (this.state.meetingData.decided === true) {
+            document.getElementById("suggestionsTable").innerText =
+                `This meeting has been scheduled for ${this.state.meetingData.setDate} at ${this.state.meetingData.setTime}.`;
         }
-        // else if user is not the meeting creator, don't show the buttons
-        else if (this.props.userID !== this.props.meetingCreatorID) {
-            content = 
-                <ul>
-                    <li>{this.state.meetingDate1}</li>
-                    <li>{this.state.meetingDate2}</li>
-                    <li>{this.state.meetingDate3}</li>
-                </ul>
-        }
-        // else the user is the meeting creator, then show the table and set meeting buttons
+        // else render the table
         else {
-            content = 
-                <ul>
+            if (this.state.bestTimes[0] != null) {
+                meeting1 = 
                     <li>
-                        {this.state.meetingDate1}
-                        <button onClick={() => this.sendEmail(this.state.meetingDate1)}>
+                        {this.state.bestTimes[0]}
+                        <button onClick={() => this.sendEmail(this.state.bestTimes[0])}>
                             Set Meeting and Email Participants
                         </button>
-                    </li>
+                    </li>;
+            }
+            if (this.state.bestTimes[1] != null) {
+                meeting2 = 
                     <li>
-                        {this.state.meetingDate2}
-                        <button onClick={() => this.sendEmail(this.state.meetingDate2)}>
+                        {this.state.bestTimes[1]}
+                        <button onClick={() => this.sendEmail(this.state.bestTimes[1])}>
                             Set Meeting and Email Participants
                         </button>
-                    </li>
+                    </li>;
+            }
+            if (this.state.bestTimes[2] != null) {
+                meeting3 = 
                     <li>
-                        {this.state.meetingDate3}
-                        <button onClick={() => this.sendEmail(this.state.meetingDate3)}>
+                        {this.state.bestTimes[2]}
+                        <button onClick={() => this.sendEmail(this.state.bestTimes[2])}>
                             Set Meeting and Email Participants
                         </button>
-                    </li>
-                </ul>
+                    </li>;
+            }
         }
 
         return (
             <div>
                 <h2>Suggested Meeting Times</h2>
                 <div id="suggestionsTable">
-                    {content}
+                    <ul>
+                        {meeting1}
+                        {meeting2}
+                        {meeting3}
+                    </ul>
                 </div>
             </div>
         );
