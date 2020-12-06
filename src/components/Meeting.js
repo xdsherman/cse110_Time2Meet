@@ -243,11 +243,6 @@ class Meeting extends Component {
                 <label>What is the name of this meeting?</label>
                 <input onChange= {e =>this.setState({meetingName : e.target.value})} />
                 <br />
-                {this.state.meetingID ?
-                <Invite creatorID={this.state.creatorID}
-                        meetingID={this.state.meetingID}
-                        meetingName={this.state.meetingName}
-                        showT={false}/> : null}
                 <button onClick={this.pushToFirebase}>Create Meeting</button>
                 <button onClick={this.redirectHome}>Cancel</button>
             </div>

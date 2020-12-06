@@ -96,6 +96,7 @@ class Invite extends Component {
     getUserID(event){
         let { send, emails, meetingName, meetingID, userIDs, idEmails } = this.state;
         let invEmail = []
+        console.log(meetingName)
         if(send){
             this.setState({send: false})
         }else{
@@ -104,6 +105,7 @@ class Invite extends Component {
                 const index = idEmails.findIndex(isEmail);
                 if(index == -1){
                     invEmail.push(email)
+                    this.sendInvitation(meetingName, email);
                     this.firebaseRef_U.child("invitations").child(meetingID).update({invEmail});
                 }else{
                     let userID = idEmails[index].id;

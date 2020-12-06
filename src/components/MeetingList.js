@@ -144,7 +144,7 @@ class MeetingList extends Component {
                         <button onClick={this.createMeeting}>Create Meeting</button>
                     </div>
                     <div className="meetingList">
-                        <label>Currently Meetings</label>
+                        <label>Current Meetings</label>
                         <div>
                             {futureMeeting.length ? futureMeeting : <p>No Current Meeting</p>}
                         </div>
