@@ -36,6 +36,7 @@ class Meeting extends Component {
         this.handleWeekClick = this.handleWeekClick.bind(this);
         this.handleMenu = this.handleMenu.bind(this);
         this.setWindow = this.setWindow.bind(this);
+        this.convertTo12Hr = this.convertTo12Hr.bind(this)
 
 
     }
@@ -63,12 +64,12 @@ class Meeting extends Component {
             meetingDays.push(day);
         }
         this.setState({ meetingDays});
-        console.log(meetingDays);
+        //console.log(meetingDays);
     }
 
     handleWeekClick = (weekNumber, days, e) => {
         const { meetingDays } = this.state;
-        console.log(weekNumber)
+        //console.log(weekNumber)
         let weekIncluded = true;
         let included = [];
 
@@ -98,7 +99,7 @@ class Meeting extends Component {
         }
 
         this.setState({ meetingDays});
-        console.log(this.state.meetingDays)
+        //console.log(this.state.meetingDays)
     };
 
     handleMenu(event){
@@ -124,6 +125,12 @@ class Meeting extends Component {
                 showT: false
             })
         }
+    }
+
+    convertTo12Hr(hour) {
+        var AMPM = (hour < 12) ? "AM" : "PM";
+        var h = (hour % 12) || 12;
+        return h + AMPM;
     }
 
     componentWillUnmount() {
@@ -229,9 +236,9 @@ class Meeting extends Component {
                     onDayClick={this.handleDayClick}
                     onWeekClick={this.handleWeekClick}
                 />
-                <button id = {0} onClick={this.handleMenu}>{this.state.startTime ? this.state.startTime : "From"}</button>
+                <button id = {0} onClick={this.handleMenu}>{this.state.startTime ? this.convertTo12Hr(this.state.startTime) : "From"}</button>
                 {this.state.showF ? (<div className="menu" id = {0}>{AM}{PM}</div>) : null}
-                <button id = {1} onClick={this.handleMenu}>{this.state.endTime ? this.state.endTime : "To"}</button>
+                <button id = {1} onClick={this.handleMenu}>{this.state.endTime ? this.convertTo12Hr(this.state.endTime) : "To"}</button>
                 {this.state.showT ? (<div className="menu" id = {1}>{AM}{PM}</div>) : null}
                 <label>What is the name of this meeting?</label>
                 <input onChange= {e =>this.setState({meetingName : e.target.value})} />

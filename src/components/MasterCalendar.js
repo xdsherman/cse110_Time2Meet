@@ -71,8 +71,8 @@ class MasterCalendar extends Component {
     hover(event){
         let key = event.target.getAttribute('id');
         const {availabilities} = this.state;
-        console.log(key);
-        console.log(availabilities);
+        //console.log(key);
+        //console.log(availabilities);
         if (key in availabilities){
            alert(availabilities[key]["users"] + ": " + availabilities[key]["priority"]);
         }

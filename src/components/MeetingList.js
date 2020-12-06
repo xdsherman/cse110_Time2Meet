@@ -42,7 +42,7 @@ class MeetingList extends Component {
         this.firebaseRef.once('value').then((snapshot) => {
 
             if (snapshot.val() != null && snapshot.child("meetingIDs").val() != null) {
-                console.log("id")
+                //console.log("id")
                 //console.log(snapshot.child("meetingIDs").val())
                 this.setState({
                     meetingIDs: snapshot.child("meetingIDs").val(),
@@ -63,13 +63,10 @@ class MeetingList extends Component {
         let meetingNames = [];
         let decidedM  = [];
 
-        if(meetingIDs !== null){
-            console.log(meetingIDs)
-        }
         this.firebaseRef_M.once('value').then((snapshot) => {
             for(const id of meetingIDs){
                 if (snapshot.val() != null && snapshot.child(id).val() != null) {
-                    console.log("fetch")
+                    //console.log("fetch")
                     //console.log(snapshot.child("meetingIDs").val())
                     meetingNames.push(snapshot.child(id).child("meetingName").val())
                     decidedM.push(snapshot.child(id).child("decided").val())
@@ -136,8 +133,6 @@ class MeetingList extends Component {
                     futureMeeting.push(<div key = {id} id = {this.state.meetingIDs[id]}>{this.state.meetingNames[id]}<button onClick={this.clickMeeting}>View Meeting</button></div>);
                 }
             }
-        }else{
-            console.log("render")
         }
 
         return (
@@ -149,13 +144,13 @@ class MeetingList extends Component {
                         <button onClick={this.createMeeting}>Create Meeting</button>
                     </div>
                     <div className="meetingList">
-                        <label>Future Meetings</label>
+                        <label>Currently Meetings</label>
                         <div>
-                            {futureMeeting.length ? futureMeeting : <p>No Future Meeting</p>}
+                            {futureMeeting.length ? futureMeeting : <p>No Current Meeting</p>}
                         </div>
-                        <label>Past Meetings</label>
+                        <label>Planned Meetings</label>
                         <div>
-                            {pastMeeting.length ? pastMeeting : <p>No Past Meeting</p>}
+                            {pastMeeting.length ? pastMeeting : <p>No Planned Meeting</p>}
                         </div>
                     </div>
                     <button onClick={() => db.auth().signOut()}>Sign Out</button>

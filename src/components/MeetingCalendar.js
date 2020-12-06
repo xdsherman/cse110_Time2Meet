@@ -21,7 +21,7 @@ class MeetingCalendar extends Component {
             availability: [],
             decided: '',
             edit: false,
-            priority: 1,
+            priority: 3,
             index: 0
         };
 
@@ -125,8 +125,8 @@ class MeetingCalendar extends Component {
                     included = true
                     availability.splice(index, 1);
                     if(value.priority != priorityVal){
-                        console.log(value.priority)
-                        console.log(priorityVal)
+                        //console.log(value.priority)
+                        //console.log(priorityVal)
                         availability.push(ava.props);
                     }
                 }
@@ -140,7 +140,7 @@ class MeetingCalendar extends Component {
 
     changePriority(event){
         let priority = event.target.getAttribute('id');
-        console.log(priority);
+        //console.log(priority);
         if(priority == 1)
             this.setState({
                 priority: 1

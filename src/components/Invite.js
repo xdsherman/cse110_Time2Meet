@@ -67,6 +67,7 @@ class Invite extends Component {
     }
 
     sendInvitation(meetingName, email){
+        console.log("sendInvitation")
         var http = new XMLHttpRequest();
         var url = 'https://api.emailjs.com/api/v1.0/email/send';
         var data = {
@@ -110,7 +111,7 @@ class Invite extends Component {
                     const id = userIDs.findIndex(isUID);
                     if (id == -1) {
                         userIDs.push(userID);
-                        //this.sendInvitation(meetingName, email);
+                        this.sendInvitation(meetingName, email);
                     }
 
                     this.pushToFirebase(event);
@@ -139,7 +140,7 @@ class Invite extends Component {
         this.firebaseRef_U.once('value').then((snapshot) => {
             if (snapshot.val() != null){
                 for(const uid of userIDs) {
-                    console.log(uid)
+                    //console.log(uid)
                     if (snapshot.child(uid).val() != null){
                         let meetingIDs = [];
                         if(snapshot.child(uid).child("meetingIDs").val() != null){
