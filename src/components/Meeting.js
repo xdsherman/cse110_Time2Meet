@@ -105,20 +105,30 @@ class Meeting extends Component {
     handleMenu(event){
         let id = event.target.getAttribute('id');
         if(id == 0){
-            this.setState({showF: true});
+            this.setState({
+                showF: true,
+                showT: false,
+            });
         }else{
-            this.setState({showT: true});
+            this.setState({
+                showF: false,
+                showT: true,
+            });
         }
     }
 
     setWindow(event){
-        const{ startTime, endTime } = this.state;
+        const{ startTime, endTime, showT, showF } = this.state;
 
-        let id = event.target.getAttribute('id');
+        let id = Number(event.target.getAttribute('id'));
         let parent = event.target.parentElement.getAttribute('id');
+
+        console.log(startTime)
+        console.log(endTime)
+        console.log(id)
         if(parent == 0){
             if(id >= endTime){
-                alert("Your meeting window end time is earlier than start time")
+                alert("???Your meeting window end time is earlier than start time")
             }else{
                 this.setState({
                     startTime: id,
@@ -128,7 +138,7 @@ class Meeting extends Component {
 
         }else{
             if(startTime >= id){
-                alert("Your meeting window end time is earlier than start time")
+                alert("///Your meeting window end time is earlier than start time")
             }else{
                 this.setState({
                     endTime: id,
@@ -140,7 +150,7 @@ class Meeting extends Component {
     }
 
     convertTo12Hr(hour) {
-        var AMPM = (hour < 12) ? "AM" : "PM";
+        var AMPM = (hour < 11) ? "AM" : (hour == 24) ? "AM" : "PM";
         var h = (hour % 12) || 12;
         return h + AMPM;
     }
@@ -236,8 +246,8 @@ class Meeting extends Component {
     render(){
         let AM = []
         let PM = []
-        Array.from({length: 12}, (_, i) => AM.push(<button id = {i+1} onClick={this.setWindow}>{i+1}AM</button>));
-        Array.from({length: 12}, (_, i) => PM.push(<button id = {i+13} onClick={this.setWindow}>{i+1}PM</button>));
+        Array.from({length: 24}, (_, i) => AM.push(<button id = {i+1} onClick={this.setWindow}>{this.convertTo12Hr(i+1)}</button>));
+        //Array.from({length: 12}, (_, i) => PM.push(<button id = {i+13} onClick={this.setWindow}>{i+1}PM</button>));
 
         return(
             <div className = "select">
@@ -248,10 +258,11 @@ class Meeting extends Component {
                     onDayClick={this.handleDayClick}
                     onWeekClick={this.handleWeekClick}
                 />
-                <button id = {0} onClick={this.handleMenu}>{this.state.startTime ? this.convertTo12Hr(this.state.startTime) : "From"}</button>
-                {this.state.showF ? (<div className="menu" id = {0}>{AM}{PM}</div>) : null}
-                <button id = {1} onClick={this.handleMenu}>{this.state.endTime ? this.convertTo12Hr(this.state.endTime) : "To"}</button>
-                {this.state.showT ? (<div className="menu" id = {1}>{AM}{PM}</div>) : null}
+                {this.state.showF ? (<div className="menu" id = {0}>{AM}{PM}</div>) :
+                <button id = {0} onClick={this.handleMenu}>{this.state.startTime ? this.convertTo12Hr(this.state.startTime) : "From"}</button>}
+                {this.state.showT ? (<div className="menu" id = {1}>{AM}{PM}</div>) :
+                <button id = {1} onClick={this.handleMenu}>{this.state.endTime ? this.convertTo12Hr(this.state.endTime) : "To"}</button>}
+
                 <label>What is the name of this meeting?</label>
                 <input onChange= {e =>this.setState({meetingName : e.target.value})} />
                 <br />
