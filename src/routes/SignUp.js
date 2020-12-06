@@ -7,13 +7,14 @@ const SignUp = ({ history }) => {
     const handleSignUp = (event) => {
         event.preventDefault();
         const { email, password,preferred_name } = event.target.elements;
-        let meetingIDs = []
+        let meetingIDs = [];
+        let userIDs = [];
         try{
             db
                 .auth()
                 .createUserWithEmailAndPassword(email.value,
                     password.value).then(function(user){
-                        db.auth().currentUser.updateProfile({
+                db.auth().currentUser.updateProfile({
                     displayName: preferred_name.value
                 });
 
@@ -28,24 +29,30 @@ const SignUp = ({ history }) => {
                     if (snapshot.val() != null && snapshot.child("invitations").val()!= null) {
                         for (const meetingID of Object.entries(snapshot.child("invitations").val())) {
                             const isEmail = (element) => element == db.auth().currentUser.email;
-                            console.log(meetingID[1])
-                            console.log(typeof(meetingID[1]))
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
-                                meetingIDs.push(meetingID[0])
+                                console.log("signup");
+                                console.log(meetingID[0]);
+                                meetingIDs.push(meetingID[0]);
+                                db.database().ref("meetings").once('value').then((snapshot) => {
+                                    if (snapshot.val() != null && snapshot.child(meetingID[0]).val() != null) {
+                                        if(snapshot.child(meetingID[0]).child("userIDs").val() != null){
+                                            userIDs= snapshot.child(meetingID[0]).child("userIDs").val();
+                                        }
+                                    }
+                                    console.log("current");
+                                    console.log(userIDs);
+                                    userIDs.push(db.auth().currentUser.uid);
+                                    db.database().ref("meetings").child(meetingID[0]).update({userIDs});
+                                })
                             }
                         }
                         db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
-
                     }
-
-
                 })
-
-                    }).catch(function(error) {
-               console.log(error);
+            }).catch(function(error) {
+                console.log(error);
             });
-
             history.push("/");
 
 
@@ -58,7 +65,7 @@ const SignUp = ({ history }) => {
 
 
     const redirectLogIn = () =>{
-        history.push("/login")
+        history.push("/")
     }
     return(
         <div className="centered">
@@ -77,7 +84,7 @@ const SignUp = ({ history }) => {
                     <input name="preferred_name" type="preferred_name" placeholder="Preferred name" />
                 </label>
                 <button type="submit" > Sign Up</button>
-                </form>
+            </form>
             <button onClick={redirectLogIn}>Log In</button>
         </div>
     );

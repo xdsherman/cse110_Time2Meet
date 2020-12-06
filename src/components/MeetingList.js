@@ -118,6 +118,7 @@ class MeetingList extends Component {
                     meetingID: meetingID,
                 }
             });
+
             return <Redirect to="/Calendar" />;
         }
     }
