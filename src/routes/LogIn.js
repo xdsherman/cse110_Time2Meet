@@ -22,6 +22,8 @@ const Login = ({history}) => {
         }
     }
     const handleLoginWithGoogle = () => {
+        let meetingIDs = [];
+        let userIDs = [];
         try{
             db
                 .auth()
@@ -33,6 +35,31 @@ const Login = ({history}) => {
                     email: db.auth().currentUser.email,//db.auth().currentUser.email
                     meeting: []
                 })}
+                db.database().ref("UserInfo").once('value').then((snapshot) => {
+                    if (snapshot.val() != null && snapshot.child("invitations").val()!= null) {
+                        for (const meetingID of Object.entries(snapshot.child("invitations").val())) {
+                            const isEmail = (element) => element == db.auth().currentUser.email;
+                            const index = meetingID[1].invEmail.findIndex(isEmail);
+                            if(index !== -1){
+                                console.log("signup");
+                                console.log(meetingID[0]);
+                                meetingIDs.push(meetingID[0]);
+                                db.database().ref("meetings").once('value').then((snapshot) => {
+                                    if (snapshot.val() != null && snapshot.child(meetingID[0]).val() != null) {
+                                        if(snapshot.child(meetingID[0]).child("userIDs").val() != null){
+                                            userIDs= snapshot.child(meetingID[0]).child("userIDs").val();
+                                        }
+                                    }
+                                    console.log("current");
+                                    console.log(userIDs);
+                                    userIDs.push(db.auth().currentUser.uid);
+                                    db.database().ref("meetings").child(meetingID[0]).update({userIDs});
+                                })
+                            }
+                        }
+                        db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
+                    }
+                })
             }).catch(function(error) {
                 alert(error);
             });

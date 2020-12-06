@@ -23,8 +23,7 @@ class Invite extends Component {
             idEmails: [],
             invEmail: [],
             send: false,
-            showT: this.props.showT,
-            showI: this.props.showI,
+            decided: false,
         };
 
 
@@ -45,6 +44,7 @@ class Invite extends Component {
                 if(snapshot.child(this.state.meetingID).child("userIDs").val() != null){
                     this.setState({
                         userIDs: snapshot.child(this.state.meetingID).child("userIDs").val(),
+                        decided: snapshot.child(this.state.meetingID).child("decided").val(),
                     });
                 }
             }
@@ -180,14 +180,13 @@ class Invite extends Component {
         const { emails, send} = this.state;
         return(
             <div>
-                {this.state.showT ?
                     <div><TabularView
                         meetingID={this.state.meetingID}
                         meetingName={this.state.meetingName}
                         userID={this.state.userID}
                         meetingCreatorID= {this.state.creatorID}
-                    /></div>:null}
-                {this.state.showI ? null:
+                    /></div>
+                {this.state.decided ? null:
                     <div>
                         <label>Enter email addresses:</label>
                         {send ? <p>Invitations sent! </p> :

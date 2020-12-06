@@ -14,6 +14,8 @@ class MeetingCalendar extends Component {
             creatorID: '',
             meetingID: this.props.location.state.meetingID,
             meetingName: '',
+            setDate: '',
+            setTime: '',
             meetingDays: '',
             startTime: '',
             endTime: '',
@@ -62,6 +64,8 @@ class MeetingCalendar extends Component {
                     meetingDays: snapshot.child(this.state.meetingID).child("meetingDays").val(),
                     userIDs: snapshot.child(this.state.meetingID).child("userIDs").val(),
                     decided: snapshot.child(this.state.meetingID).child("decided").val(),
+                    setTime: snapshot.child(this.state.meetingID).child("setTime").val(),
+                    setDate: snapshot.child(this.state.meetingID).child("setDate").val(),
                 });
             }
         })
@@ -237,9 +241,10 @@ class MeetingCalendar extends Component {
                         <Invite creatorID={this.state.creatorID}
                                 meetingID={this.state.meetingID}
                                 meetingName={this.state.meetingName}
-                                showT={true}
                                 showI={this.state.decided}/>
                     </div> : null}
+                {this.state.decided ? <p>This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}</p>
+                : null}
                 {this.state.meetingDays ?
                     <div><MasterCalendar
                         meetingID = {this.state.meetingID}

@@ -112,18 +112,30 @@ class Meeting extends Component {
     }
 
     setWindow(event){
+        const{ startTime, endTime } = this.state;
+
         let id = event.target.getAttribute('id');
         let parent = event.target.parentElement.getAttribute('id');
         if(parent == 0){
-            this.setState({
-                startTime: id,
-                showF: false
-            })
+            if(id >= endTime){
+                alert("Your meeting window end time is earlier than start time")
+            }else{
+                this.setState({
+                    startTime: id,
+                    showF: false
+                })
+            }
+
         }else{
-            this.setState({
-                endTime: id,
-                showT: false
-            })
+            if(startTime >= id){
+                alert("Your meeting window end time is earlier than start time")
+            }else{
+                this.setState({
+                    endTime: id,
+                    showT: false
+                })
+            }
+
         }
     }
 
