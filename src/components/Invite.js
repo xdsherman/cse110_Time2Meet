@@ -94,7 +94,7 @@ class Invite extends Component {
 
     getUserID(event){
         let { send, emails, meetingName, meetingID, userIDs, idEmails } = this.state;
-
+        let invEmail = []
         if(send){
             this.setState({send: false})
         }else{
@@ -102,7 +102,8 @@ class Invite extends Component {
                 const isEmail = (element) => element.email == email;
                 const index = idEmails.findIndex(isEmail);
                 if(index == -1){
-                    this.firebaseRef_U.child("invitations").child(email).update({meetingID});
+                    invEmail.push(email)
+                    this.firebaseRef_U.child("invitations").child(meetingID).update({invEmail});
                 }else{
                     let userID = idEmails[index].id;
                     const isUID = (element) => element == userID;
@@ -111,14 +112,15 @@ class Invite extends Component {
                         userIDs.push(userID);
                         //this.sendInvitation(meetingName, email);
                     }
-                    this.setState({
-                        userIDs: userIDs,
-                        send: true,
-                    });
+
                     this.pushToFirebase(event);
 
                 }
             }
+            this.setState({
+                userIDs: userIDs,
+                send: true,
+            });
 
 
 

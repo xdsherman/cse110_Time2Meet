@@ -7,6 +7,7 @@ const SignUp = ({ history }) => {
     const handleSignUp = (event) => {
         event.preventDefault();
         const { email, password,preferred_name } = event.target.elements;
+        let meetingIDs = []
         try{
             db
                 .auth()
@@ -22,9 +23,29 @@ const SignUp = ({ history }) => {
                     email: db.auth().currentUser.email,//db.auth().currentUser.email
                     //meeting: []
                 })
+
+                db.database().ref("UserInfo").once('value').then((snapshot) => {
+                    if (snapshot.val() != null && snapshot.child("invitations").val()!= null) {
+                        for (const meetingID of Object.entries(snapshot.child("invitations").val())) {
+                            const isEmail = (element) => element == db.auth().currentUser.email;
+                            console.log(meetingID[1])
+                            console.log(typeof(meetingID[1]))
+                            const index = meetingID[1].invEmail.findIndex(isEmail);
+                            if(index !== -1){
+                                meetingIDs.push(meetingID[0])
+                            }
+                        }
+                        db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
+
+                    }
+
+
+                })
+
                     }).catch(function(error) {
                console.log(error);
             });
+
             history.push("/");
 
 
