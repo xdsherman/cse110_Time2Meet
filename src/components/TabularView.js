@@ -6,26 +6,37 @@ class TabularView extends Component {
         super(state)
         this.state = {
             meetingID: this.props.meetingID,
-            usernameList: this.props.usernameList,
-            emailList: this.props.emailList,
             meetingName: this.props.meetingName,
 
-            userID: this.props.userID,
-            meetingCreatorID: this.props.meetingCreatorID,
-
+            userIDs: this.props.userIDs,
+            creatorID: this.props.creatorID,
+            namesEmails: [],
             meetingData: [],
-
-            // for calculating top 3 suggested meetingtimes
-            availabilities: {},
             bestTimes: []
         }
         
         this.firebaseMeetingsRef = db.database().ref("meetings/"+this.state.meetingID);
         this.firebaseAvailabilitiesRef = db.database().ref("availability/"+this.state.meetingID);
+        this.firebaseUsersRef = db.database().ref("UserInfo");
+        this.updateUsers = this.updateUsers.bind(this);
     }
     componentWillUnmount() {
         this.firebaseMeetingsRef.off();
         this.firebaseAvailabilitiesRef.off();
+    }
+    updateUsers(userIDs){
+        console.log(userIDs);
+        this.firebaseUsersRef.on('value', (snapshot)=>{
+            const {namesEmails} = this.state;
+            for (const id of userIDs){
+                if (id in snapshot.val()){
+                    const name = snapshot.child(id).child("name").val();
+                    const email = snapshot.child(id).child("email").val();
+                    namesEmails[name] = email;
+                }
+            }
+            this.setState({namesEmails:namesEmails})
+        });
     }
     componentDidMount() {
         // read meeting table in database
@@ -33,6 +44,8 @@ class TabularView extends Component {
             this.setState({
                 meetingData: snapshot.val()
             });
+            //get names and emails of users
+            this.updateUsers(snapshot.val().userIDs);
         });
 
         // calculate top 3 times
@@ -65,15 +78,15 @@ class TabularView extends Component {
                     bestTimes.push(sortable[key][0]);
                 }
                 this.setState({
-                    bestTimes: bestTimes,
-                    availabilities: avaArray
+                    bestTimes: bestTimes
                 })
             }
         });
     }
 
     convertTo12Hr(hour) {
-        var AMPM = (hour < 12) ? "AM" : "PM";
+        hour = Number(hour);
+        var AMPM = (hour < 12) ? "AM" : (hour == 24) ? "AM" : "PM";
         var h = (hour % 12) || 12;
         return h + AMPM;
     }
@@ -88,12 +101,7 @@ class TabularView extends Component {
             setDate: date,
             setTime: time
         });
-
-        // uncomment this for email functionality
-        /*
-        // send emails to each user in the meeting through emailjs API
-        for (let i = 0; i < this.state.usernameList.length; i++) {
-            // create http post request
+        for (const [name, email] of Object.entries(this.state.namesEmails)){
             var http = new XMLHttpRequest();
             var url = 'https://api.emailjs.com/api/v1.0/email/send';
             var data = {
@@ -101,8 +109,8 @@ class TabularView extends Component {
                 template_id: 'contact_form',
                 user_id: 'user_afExeUlzmWRabJUP88WuS',
                 template_params: {
-                    'username': this.state.usernameList[i],
-                    'to_email': this.state.emailList[i],
+                    'username': name,
+                    'to_email': email,
                     'meeting_name': this.state.meetingName,
                     'meeting_date': selectedDate
                 }
@@ -112,13 +120,12 @@ class TabularView extends Component {
             http.onreadystatechange = function() {
                 // if successful, remove suggestions table
                 if(http.readyState === 4 && http.status === 200) {
-                    document.getElementById("suggestionsTable").innerText = 
+                    document.getElementById("suggestionsTable").innerText =
                         "Participants emailed successfully! Meeting has been scheduled for: " + selectedDate;
                 }
             }
             http.send(JSON.stringify(data));
         }
-        */
     }
     
     render() {
@@ -132,36 +139,55 @@ class TabularView extends Component {
         // else render the table
         else {
             if (this.state.bestTimes[0] != null) {
-                meeting1 = 
-                    <li>
-                        {this.state.bestTimes[0]}
-                        <button onClick={() => this.sendEmail(this.state.bestTimes[0])}>
-                            Set Meeting and Email Participants
-                        </button>
-                    </li>;
+                if (db.auth().currentUser.uid === this.state.creatorID) {
+                    meeting1 = 
+                        <li>
+                            {this.state.bestTimes[0]}
+                            <button onClick={() => this.sendEmail(this.state.bestTimes[0])}>
+                                Set Meeting and Email Participants
+                            </button>
+                        </li>;
+                }
+                else {
+                    meeting1 = 
+                        <li>{this.state.bestTimes[0]}</li>;
+                }
             }
             if (this.state.bestTimes[1] != null) {
-                meeting2 = 
-                    <li>
-                        {this.state.bestTimes[1]}
-                        <button onClick={() => this.sendEmail(this.state.bestTimes[1])}>
-                            Set Meeting and Email Participants
-                        </button>
-                    </li>;
+                if (db.auth().currentUser.uid === this.state.creatorID) {
+                    meeting2 = 
+                        <li>
+                            {this.state.bestTimes[1]}
+                            <button onClick={() => this.sendEmail(this.state.bestTimes[1])}>
+                                Set Meeting and Email Participants
+                            </button>
+                        </li>;
+                }
+                else {
+                    meeting2 = 
+                        <li>{this.state.bestTimes[1]}</li>;
+                }
             }
             if (this.state.bestTimes[2] != null) {
-                meeting3 = 
-                    <li>
-                        {this.state.bestTimes[2]}
-                        <button onClick={() => this.sendEmail(this.state.bestTimes[2])}>
-                            Set Meeting and Email Participants
-                        </button>
-                    </li>;
+                if (db.auth().currentUser.uid === this.state.creatorID) {
+                    meeting3 = 
+                        <li>
+                            {this.state.bestTimes[2]}
+                            <button onClick={() => this.sendEmail(this.state.bestTimes[2])}>
+                                Set Meeting and Email Participants
+                            </button>
+                        </li>;
+                }
+                else {
+                    meeting3 = 
+                        <li>{this.state.bestTimes[2]}</li>;
+                }
             }
         }
 
+        console.log(this.state.userIDs);
         return (
-            <div>
+            <div className="tabularView">
                 <h2>Suggested Meeting Times</h2>
                 <div id="suggestionsTable">
                     <ul>

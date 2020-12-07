@@ -2,192 +2,258 @@ import React, {Component} from 'react';
 import db from '../base';
 import "../style.css";
 import { Redirect } from "react-router-dom";
-import Meeting from './Meeting';
-import MasterCalendar from './MasterCalendar';
+import Invite from "./Invite";
+import MasterCalendar from "./MasterCalendar";
+import TabularView from "./TabularView";
 
 class MeetingCalendar extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            userID: this.props.location.state.userID,
+            creatorID: '',
             meetingID: this.props.location.state.meetingID,
-            meetingDays: this.props.location.state.meetingDays,
-            userID: 'xz',
+            meetingName: '',
+            setDate: '',
+            setTime: '',
+            meetingDays: '',
+            startTime: '',
+            endTime: '',
+            userIDs: [],
             availability: [],
-            color: "#f1f1f1",
+            decided: '',
             edit: false,
-            retrieved: [],
-            priority: 3
+            priority: 3,
+            index: 0
         };
-        this.firebaseRef = db.database().ref("availability/"+this.state.meetingID+"/"+this.state.userID);
+
+
         this.addAvailability = this.addAvailability.bind(this);
         this.pushToFirebase = this.pushToFirebase.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
+        this.handleHome = this.handleHome.bind(this);
         this.changePriority = this.changePriority.bind(this);
-        this.retrieveData = this.retrieveData.bind(this);
-        this.checkData = this.checkData.bind(this);
-        // Get the availabilities at start up
+        this.toggle = this.toggle.bind(this);
+        this.convertTo12Hr = this.convertTo12Hr.bind(this);
+        //this.checkData = this.checkData.bind(this);
+    }
 
+    componentDidMount() {
+        this.firebaseRef = db.database().ref("availability/"+this.state.meetingID+"/"+this.state.userID);
+        //console.log(this.firebaseRef);
+        // Get the availabilities at start up
+        this.firebaseRef.once('value').then((snapshot) => {
+            if (snapshot.val() != null && snapshot.child("availability").val()!=null) {
+                this.setState({
+                    availability: snapshot.child("availability").val()
+                });
+            }
+        })
+
+        //retrieve data of meeting
+        this.firebaseRef_M = db.database().ref("meetings");
+        //console.log(this.firebaseRef);
+
+        this.firebaseRef_M.on('value', snapshot => {
+            if (snapshot.val() != null && snapshot.child(this.state.meetingID).val() != null) {
+                this.setState({
+                    creatorID: snapshot.child(this.state.meetingID).child("creatorID").val(),
+                    meetingName: snapshot.child(this.state.meetingID).child("meetingName").val(),
+                    startTime: snapshot.child(this.state.meetingID).child("startTime").val(),
+                    endTime: snapshot.child(this.state.meetingID).child("endTime").val(),
+                    meetingDays: snapshot.child(this.state.meetingID).child("meetingDays").val(),
+                    userIDs: snapshot.child(this.state.meetingID).child("userIDs").val(),
+                    decided: snapshot.child(this.state.meetingID).child("decided").val(),
+                    setTime: snapshot.child(this.state.meetingID).child("setTime").val(),
+                    setDate: snapshot.child(this.state.meetingID).child("setDate").val(),
+                });
+            }
+        })
     }
 
     componentWillUnmount() {
         this.firebaseRef.off();
-    }
-    componentDidMount(){
-        this.firebaseRef.once('value').then((snapshot) => {
-            if (snapshot.child('availability').val() != null) {
-                this.setState({
-                    retrieved: snapshot.child('availability').val()
-                });
-            }
-        })
+        this.firebaseRef_M.off();
     }
 
     pushToFirebase(event) {
         if(this.state.edit){
-            const {availability}  = this.state;
+            const { availability } = this.state;
             event.preventDefault();
-            let ava = availability[0];
-
-            if (availability.length !== 0)
-                this.firebaseRef.set({availability});
-/*            for (const value of Object.values(availability)){
-                console.log(value.day.replace(/\//g,'')+value.hour+value.priority)
-                this.firebaseRef.child(value.day.replace(/\//g,'')+value.hour+value.priority).set(value);
-            }*/
-
+            this.firebaseRef.set({availability});
             this.setState({
-                availability: [],
                 edit: false
             });
         }else{
-            //TODO: retrieve data
-            this.retrieveData();
-            this.setState({
-                edit: true
-            });
-/*            // db.database().ref("availability/"+this.state.meetingID).once('value').then((snapshot) => {
-            //     console.log(snapshot.val())
-            // });*/
+            if(!this.state.decided){
+                this.setState({
+                    edit: true
+                });
+            }
+
         }
 
     }
-    retrieveData(event){
-        this.firebaseRef.on('value', (snapshot) => {
-            if (snapshot.child('availability').val() != null) {
-                this.setState({
-                    retrieved: snapshot.child('availability').val()
-                });
-            }
-        })
-    }
-    checkData(){
 
+    convertTo12Hr(hour) {
+        hour = Number(hour);
+        var AMPM = (hour < 12) ? " AM" : (hour == 24) ? " AM" : " PM";
+        var h = (hour % 12) || 12;
+        return h + AMPM;
+    }
+
+    toggle(event) {
+        let direction = event.target.getAttribute('id');
+        if (direction === 'next' & this.state.index < Math.floor(this.state.meetingDays.length/8)){
+            this.setState({
+                index: this.state.index+1
+            })
+        } else if (direction === 'prev' & this.state.index > 0){
+            this.setState({
+                index: this.state.index-1
+            })
+        }
     }
 
     addAvailability(event){
-        if(this.state.edit){
-            var color
-            if (this.state.priority === 1)
-                color = "#aafcfd"
-            else if (this.state.priority === 2)
-                color = '#31f9fc'
-            else
-                color = '#018788'
-            event.target.style.backgroundColor = color;
-            const { availability } = this.state;
-            // id of the target div is in the format {hour+'-'+day}
+        if(this.state.edit && !this.state.decided){
+            let { availability } = this.state;
             let hourID = event.target.getAttribute('id').split('-')[0];
             let dayID = event.target.parentElement.getAttribute('id');
             let priorityVal = this.state.priority;
             let ava = <Availability hour = {hourID} day = {dayID} priority = {priorityVal}/>;
             // Check if you have already marked this slot
-            var included = false;
-            for (const value of Object.values(availability)){
-                if (value.hour === hourID && value.day === dayID && value.priority === priorityVal){
-                    included = true;
-                }
-                else if (value.hour === hourID && value.day ===dayID){
-                    const index = availability.indexOf(value);
-                    const removed = availability.splice(index,1);
+            let included = false
+            for (const index in availability){
+                let value = availability[index]
+                if (value.hour === hourID && value.day === dayID){
+                    included = true
+                    availability.splice(index, 1);
+                    if(value.priority != priorityVal){
+                        //console.log(value.priority)
+                        //console.log(priorityVal)
+                        availability.push(ava.props);
+                    }
                 }
             }
-            if (!included)
+            if(!included){
                 availability.push(ava.props);
-            this.setState(availability);
-        }else{
-            //TODO: display available participants
+            }
+            this.setState({availability});
         }
-
     }
 
     changePriority(event){
-        if(this.state.priority === 1)
-            this.setState({
-                priority: 2
-            });
-        else if(this.state.priority === 2)
-            this.setState({
-                priority: 3
-            });
-        else if(this.state.priority === 3)
+        let priority = event.target.getAttribute('id');
+        //console.log(priority);
+        if(priority == 1)
             this.setState({
                 priority: 1
             });
+        else if(priority == 2)
+            this.setState({
+                priority: 2
+            });
+        else if(priority == 3)
+            this.setState({
+                priority: 3
+            });
+        //console.log(this.state.priority);
     }
 
     handleCreate(event){
+        this.props.history.push({
+            pathname:"/createMeeting",
+            state:{
+                creatorID: this.state.ID,
+                meetingID: this.state.meetingID,
+            }
+        });
+        return <Redirect to="/createMeeting" />;
+    }
+
+    handleHome(event){
         this.props.history.push("/");
         return <Redirect to="/" />;
     }
 
     render() {
-        let slots = {};
-        // slots is an object with days as keys and an array of slots as value
+        let slots = [];
         let hours = [];
-        //console.log(this.state.retrieved)
+        let days = [];
+        let time = Number(this.state.startTime);
+        let windowLength = this.state.endTime - this.state.startTime;
+        //start time window, displays 1-12, half hour, 7 days per window
+        Array.from({length: windowLength}, (_, i) => hours.push(<div>{this.convertTo12Hr(i+time)}</div>));
 
-        //TODO: start time window, displays 1-12, half hour, 7 days per window
-        Array.from({length: 24}, (_, i) => hours.push(<div>{i+1}</div>));
-        // Create individual slot with unique id instead of sharing the same slots array between all columns (this is to create a unique slot to change color, initially all columns were sharing the same slot)
         for (const eachday of this.state.meetingDays){
-            var slot = [];
-            Array.from({length: 24}, (_, i) =>
-                slot.push(<div id ={i+'-'+eachday} style={{backgroundColor: this.state.color}} onClick={this.addAvailability}></div>));
+            let slot = [];
+            Array.from({length: windowLength}, (_, i) =>
+                slot.push(<div id ={i+Number(this.state.startTime)+'-'+eachday} style={{backgroundColor: this.state.color}} onClick={this.addAvailability}></div>));
             slots[eachday] = slot;
         }
-        let days = this.state.meetingDays.map(day => <div id = {day}><div className="day">{day}</div><div id={day} className= "slots">{slots[day]}</div></div>);
-        //console.log(days[0].props.children[1].props.children[0].props);
-        // retrieved is an array of availabilities
-        // Update the color based what's in retrieved
+        if(this.state.meetingDays.length != 0){
+            days = this.state.meetingDays.map(day => <div id = {day}><div className="day">{day}</div><div id={day} className= "slots">{slots[day]}</div></div>);
+        }
 
-        if (this.state.retrieved.length !== 0 && !this.state.edit) {
-            for (const value of Object.values(this.state.retrieved)) {
-                var day = value.day;
-                var hour = value.hour;
-                var color
+
+
+        if (Object.keys(this.state.availability).length !== 0 && days.length !== 0) {
+            for (const value of Object.values(this.state.availability)) {
+                let day = value.day;
+                let hour = value.hour;
+                let color = 0;
                 if (value.priority === 1)
-                    color = "#aafcfd"
+                    color = "#bde5f2"
                 else if (value.priority === 2)
-                    color = '#31f9fc'
+                    color = '#77c6e0'
                 else
-                    color = '#018788'
-                //console.log(days.find(x => x.props.id === day));
+                    color = '#009fd4'
+                //console.log(day,hour);
+                //console.log(days.find(x => x.props.id === day).props.children[1]);
                 // Change color by getting the day column, then hour column to reach in the individual slot
-                days.find(x => x.props.id === day).props.children[1].props.children[hour].props.style.backgroundColor = color;
-
+                //days.find(x => x.props.id === day).props.children[1].props.children.find(x => x.props.id === hour).props.style.backgroundColor = color;
+                days.find(x => x.props.id === day).props.children[1].props.children.find(x => x.props.id.split('-')[0] === hour).props.style.backgroundColor = color;
             }
         }
+
+        let daysOut = [];
+        daysOut.push(days.slice(this.state.index*7, this.state.index*7+7));
+
         return (
             <div>
-            <div class="flex-container"><div className="hours">{hours}</div> {days}</div>
+            <div className="flex-container">
+                <div className="changePriority">
+                    <p>Meeting Name:{this.state.meetingName}</p>
+                    <p> Mark your preferences</p>
+                    <button className="changePriority_2" id={3} onClick={this.changePriority}>High</button>
+                    <button className="changePriority_1" id={2} onClick={this.changePriority}>Middle</button>
+                    <button className="changePriority_0" id={1} onClick={this.changePriority}>Low</button>
+                </div>
+                {this.state.index !== 0 && <button id = 'prev' onClick = {this.toggle}>Previous</button>}
+                {hours.length ? <div className="hours">{hours}</div> : null}{daysOut}
+                {this.state.index !== Math.floor(this.state.meetingDays.length/8) && <button id = 'next' onClick = {this.toggle}>Next</button>}
+            </div>
                 <button className="save" onClick={this.pushToFirebase}>{this.state.edit ? 'Save' : 'Edit'}</button>
-                <button className="create" onClick={this.handleCreate}>Create Another Meeting</button>
-                <button className="changePriority" onClick = {this.changePriority}>Priority : {this.state.priority}</button>
+                <button className="create" onClick={this.handleHome}>Home</button>
+                {this.state.userID == this.state.creatorID ?
+                    <div>
+                        <Invite creatorID={this.state.creatorID}
+                                meetingID={this.state.meetingID}
+                                meetingName={this.state.meetingName}
+                                showI={this.state.decided}/>
+                    </div> : 
+                this.state.decided ? <p className="listObject">This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}.</p>
+                : null}
+                {this.state.meetingDays ?
+                    <div><MasterCalendar
+                        meetingID = {this.state.meetingID}
+                        meetingDays = {this.state.meetingDays}
+                        startTime = {this.state.startTime}
+                        endTime = {this.state.endTime}
+                    /></div>
+                    : null}
 
-                <MasterCalendar
-                    meetingID = {this.state.meetingID}
-                    meetingDays = {this.state.meetingDays}
-                />
             </div>
         );
     }
