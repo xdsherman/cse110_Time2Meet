@@ -40,7 +40,9 @@ const Login = ({history}) => {
                         if(snapshot.child(db.auth().currentUser.uid) != null && snapshot.child(db.auth().currentUser.uid).child("meetingIDs").val()!= null){
                             meetingIDs = snapshot.child(db.auth().currentUser.uid).child("meetingIDs").val();
                         }
-                        for (const meetingID of Object.entries(snapshot.child("invitations").val())) {
+                        let invitations = snapshot.child("invitations").val();
+                        for (const id in invitations) {
+                            const meetingID = invitations[id];
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
@@ -58,9 +60,13 @@ const Login = ({history}) => {
                                     userIDs.push(db.auth().currentUser.uid);
                                     db.database().ref("meetings").child(meetingID[0]).update({userIDs});
                                 })
+                                invitations[id][1].splice(index, 1);
+                                if(invitations[id][1].length == 0){
+                                    invitations.splice(id, 1);
+                                }
                             }
                         }
-
+                        db.database().ref("UserInfo/").update({invitations});
                         db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
                     }
                 })
