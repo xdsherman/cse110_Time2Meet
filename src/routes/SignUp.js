@@ -47,8 +47,8 @@ const SignUp = ({ history }) => {
                                     userIDs.push(db.auth().currentUser.uid);
                                     db.database().ref("meetings").child(meetingID[0]).update({userIDs});
                                 })
-                                invitations[id][1].splice(index, 1);
-                                if(invitations[id][1].length == 0){
+                                invitations[id][1].invEmail.splice(index, 1);
+                                if(invitations[id][1].invEmail.length == 0){
                                     invitations.splice(id, 1);
                                 }
                             }

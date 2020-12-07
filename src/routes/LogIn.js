@@ -42,9 +42,15 @@ const Login = ({history}) => {
                         }
                         let invitations = Object.entries(snapshot.child("invitations").val());
                         for (const id in invitations) {
-                            //console.log(id);
-                            //console.log(meetingID)
+                            console.log(id);
+
                             const meetingID = invitations[id];
+                            //meetingID[0] is the meeting id
+                            //meetingID[1] is the array of {'ivEmail' : ...}
+                            //meetingID[1].invEmail is the array of emails
+                            console.log(meetingID[0])
+                            console.log(meetingID[1])
+                            console.log(meetingID[1].invEmail)
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
@@ -57,13 +63,14 @@ const Login = ({history}) => {
                                             userIDs= snapshot.child(meetingID[0]).child("userIDs").val();
                                         }
                                     }
-                                    console.log("current");
-                                    console.log(userIDs);
+                                    //console.log("current");
+                                    //console.log(userIDs);
                                     userIDs.push(db.auth().currentUser.uid);
                                     db.database().ref("meetings").child(meetingID[0]).update({userIDs});
                                 })
-                                invitations[id][1].splice(index, 1);
-                                if(invitations[id][1].length == 0){
+                                console.log(invitations[id])
+                                invitations[id][1].invEmail.splice(index, 1);
+                                if(invitations[id][1].invEmail.length == 0){
                                     invitations.splice(id, 1);
                                 }
                             }
