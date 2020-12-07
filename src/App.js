@@ -7,6 +7,7 @@ import Meeting from "./components/Meeting";
 import MeetingList from "./components/MeetingList";
 import Login from "./routes/LogIn"
 import SignUp from "./routes/SignUp"
+import ForgotPassword from "./routes/ForgotPassword";
 import PrivateRoute from "./auth/PrivateRoute";
 import { AuthProvider } from "./auth/Auth";
 
@@ -20,6 +21,7 @@ function App() {
                     <PrivateRoute exact path="/" component={MeetingList} />
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/signup" component={SignUp} />
+                    <Route exact path="/forgotpassword" component={ForgotPassword} />
                 </div>
             </Router>
         </AuthProvider>
