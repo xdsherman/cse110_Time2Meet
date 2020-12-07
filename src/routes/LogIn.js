@@ -40,8 +40,10 @@ const Login = ({history}) => {
                         if(snapshot.child(db.auth().currentUser.uid) != null && snapshot.child(db.auth().currentUser.uid).child("meetingIDs").val()!= null){
                             meetingIDs = snapshot.child(db.auth().currentUser.uid).child("meetingIDs").val();
                         }
-                        let invitations = snapshot.child("invitations").val();
+                        let invitations = Object.entries(snapshot.child("invitations").val());
                         for (const id in invitations) {
+                            //console.log(id);
+                            //console.log(meetingID)
                             const meetingID = invitations[id];
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);

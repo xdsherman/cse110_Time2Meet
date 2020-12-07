@@ -27,7 +27,7 @@ const SignUp = ({ history }) => {
 
                 db.database().ref("UserInfo").once('value').then((snapshot) => {
                     if (snapshot.val() != null && snapshot.child("invitations").val()!= null) {
-                        let invitations = snapshot.child("invitations").val();
+                        let invitations = Object.entries(snapshot.child("invitations").val());
                         for (const id in invitations) {
                             const meetingID = invitations[id];
                             const isEmail = (element) => element == db.auth().currentUser.email;
