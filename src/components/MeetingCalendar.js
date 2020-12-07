@@ -242,8 +242,7 @@ class MeetingCalendar extends Component {
                                 meetingID={this.state.meetingID}
                                 meetingName={this.state.meetingName}
                                 showI={this.state.decided}/>
-                    </div> : null}
-                {this.state.decided ? <p>This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}</p>
+                    </div> : this.state.decided  ? <p>This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}.</p>
                 : null}
                 {this.state.meetingDays ?
                     <div><MasterCalendar
