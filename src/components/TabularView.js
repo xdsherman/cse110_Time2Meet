@@ -69,7 +69,7 @@ class TabularView extends Component {
     }
 
     convertTo12Hr(hour) {
-        var AMPM = (hour < 12) ? "AM" : "PM";
+        var AMPM = (hour < 12) ? "AM" : (hour == 24)? "PM" : "AM";
         var h = (hour % 12) || 12;
         return h + AMPM;
     }
