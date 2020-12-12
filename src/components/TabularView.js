@@ -25,18 +25,19 @@ class TabularView extends Component {
         this.firebaseAvailabilitiesRef.off();
     }
     updateUsers(userIDs){
-        console.log(userIDs);
-        this.firebaseUsersRef.on('value', (snapshot)=>{
-            const {namesEmails} = this.state;
-            for (const id of userIDs){
-                if (id in snapshot.val()){
-                    const name = snapshot.child(id).child("name").val();
-                    const email = snapshot.child(id).child("email").val();
-                    namesEmails[name] = email;
+        if (userIDs != null) {
+            this.firebaseUsersRef.on('value', (snapshot)=>{
+                const {namesEmails} = this.state;
+                for (const id of userIDs){
+                    if (id in snapshot.val()){
+                        const name = snapshot.child(id).child("name").val();
+                        const email = snapshot.child(id).child("email").val();
+                        namesEmails[name] = email;
+                    }
                 }
-            }
-            this.setState({namesEmails:namesEmails})
-        });
+                this.setState({namesEmails:namesEmails})
+            });
+        }
     }
     componentDidMount() {
         // read meeting table in database
@@ -185,7 +186,6 @@ class TabularView extends Component {
             }
         }
 
-        console.log(this.state.userIDs);
         return (
             <div className="tabularView">
                 <h2>Suggested Meeting Times</h2>

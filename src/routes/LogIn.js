@@ -4,7 +4,6 @@ import logo from "./resource/time2meet_logo.png";
 
 import {AuthContext} from "../auth/Auth";
 import { Redirect } from "react-router-dom";
-//import db from "../base";
 import db , { provider2 } from "../base"
 const Login = ({history}) => {
 
@@ -16,10 +15,14 @@ const Login = ({history}) => {
             db
                 .auth()
                 .signInWithEmailAndPassword(email.value,
-                    password.value);
+                    password.value)
+                    .catch(function(error) {
+                        alert(error["message"]);
+                        history.push("/signup");
+                    });
             history.push("/");
         } catch(error){
-            alert(error);
+            alert(error["message"]);
         }
     }
     const handleLoginWithGoogle = () => {
@@ -57,8 +60,6 @@ const Login = ({history}) => {
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
-                                //console.log("signup");
-                                //console.log(meetingID[0]);
                                 meetingIDs.push(meetingID[0]);
                                 db.database().ref("meetings").once('value').then((snapshot) => {
                                     if (snapshot.val() != null && snapshot.child(meetingID[0]).val() != null) {
@@ -66,14 +67,10 @@ const Login = ({history}) => {
                                             userIDs= snapshot.child(meetingID[0]).child("userIDs").val();
                                         }
                                     }
-                                    //console.log("current");
-                                    //console.log(userIDs);
                                     userIDs.push(db.auth().currentUser.uid);
                                     db.database().ref("meetings").child(meetingID[0]).update({userIDs});
                                 })
-                                //console.log(invitations[id])
                                 datasnapshot[meetingID[0]].invEmail.splice(index, 1);
-                                //invitations[id][1].invEmail.splice(index, 1);
                             }
                         }
 
@@ -83,11 +80,11 @@ const Login = ({history}) => {
                     }
                 })
             }).catch(function(error) {
-                alert(error);
+                alert(error["message"]);
             });
             history.push("/");
         } catch (error){
-            alert(error);
+            alert(error["message"]);
         }
     }
 
@@ -104,29 +101,6 @@ const Login = ({history}) => {
     }
 
     return (
-		/*
-		<div className="centered">
-			<div className="row">
-				<h1>Log In</h1>
-				<form onSubmit={handleLogin}>
-					<label>
-						Email
-						<input name="email" type="email" placeholder="Email" />
-					</label>
-					<label>
-						Password
-						<input name="password" type="password" placeholder="Password" />
-					</label>
-
-					<button type="submit"> Log In</button>
-				</form>
-				<button onClick={handleLoginWithGoogle}>Log In with Google</button>
-				<button onClick={redirectSignUp}>Sign UP</button>
-				<button onClick={redirectForgotPassword}>Forgot Password</button>
-			</div>
-        </div>
-        */
-
 		<form className="login" onSubmit={handleLogin}>
 			<img src={logo} alt=""></img>
 			<input name="email" type="text" placeholder="user email" />

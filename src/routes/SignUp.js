@@ -47,8 +47,6 @@ const SignUp = ({ history }) => {
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
-                                //console.log("signup");
-                                //console.log(meetingID[0]);
                                 meetingIDs.push(meetingID[0]);
                                 db.database().ref("meetings").once('value').then((snapshot) => {
                                     if (snapshot.val() != null && snapshot.child(meetingID[0]).val() != null) {
@@ -73,11 +71,10 @@ const SignUp = ({ history }) => {
                     }
                 })
             }).catch(function(error) {
-                console.log(error);
+                alert(error["message"]);
+                history.push("/signup");
             });
             history.push("/");
-
-
 
         } catch(error){
             alert(error);
@@ -90,28 +87,6 @@ const SignUp = ({ history }) => {
         history.push("/")
     }
     return (
-		/*
-        <div className="centered">
-            <h1>Sign Up</h1>
-            <form onSubmit={handleSignUp}>
-                <label>
-                    Email
-                    <input name="email" type="email" placeholder="Email" />
-                </label>
-                <label>
-                    Password
-                    <input name="password" type="password" placeholder="Password" />
-                </label>
-                <label>
-                    Preferred Name
-                    <input name="preferred_name" type="preferred_name" placeholder="Preferred name" />
-                </label>
-                <button type="submit" > Sign Up</button>
-            </form>
-            <button onClick={redirectLogIn}>Log In</button>
-        </div>
-        */
-
 		<form className="login" onSubmit={handleSignUp}>
 			<img src={logo} alt=""></img>
 			<input type="text" name="email" placeholder="user email" />

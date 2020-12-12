@@ -3,7 +3,6 @@ import { ReactMultiEmail, isEmail } from 'react-multi-email';
 import 'react-multi-email/style.css';
 import db from '../base';
 import "../style.css";
-import {DateUtils} from "react-day-picker";
 import TabularView from "./TabularView";
 
 interface IProps {}
@@ -26,8 +25,6 @@ class Invite extends Component {
             decided: false,
         };
 
-
-        //console.log(this.state.meetingIDs);
         this.sendInvitation = this.sendInvitation.bind(this);
         this.pushToFirebase = this.pushToFirebase.bind(this);
         this.getUserID = this.getUserID.bind(this);
@@ -103,10 +100,12 @@ class Invite extends Component {
 
     getUserID(event){
         let { send, emails, invEmail, meetingName, meetingID, userIDs, idEmails } = this.state;
-        console.log(meetingName)
         if(send){
             this.setState({send: false})
         }else{
+            if (emails.length == 0) {
+                return;
+            }
             for(const email of emails){
                 const isEmail = (element) => element.email == email;
                 const index = idEmails.findIndex(isEmail);
@@ -139,8 +138,6 @@ class Invite extends Component {
                 send: true,
             });
 
-
-
         }
 
     }
@@ -156,7 +153,6 @@ class Invite extends Component {
         this.firebaseRef_U.once('value').then((snapshot) => {
             if (snapshot.val() != null){
                 for(const uid of userIDs) {
-                    //console.log(uid)
                     if (snapshot.child(uid).val() != null){
                         let meetingIDs = [];
                         if(snapshot.child(uid).child("meetingIDs").val() != null){
@@ -190,7 +186,7 @@ class Invite extends Component {
                     /></div>
                 {this.state.decided ? null:
                     <div>
-                        <label className="listObject">Enter email addresses:</label>
+                        <label className="listObject">Invite participants by entering their email addresses:</label>
                         {send ? <p className="listObject">Invitations sent! </p> :
                         <ReactMultiEmail
                             placeholder="Email"
@@ -199,6 +195,9 @@ class Invite extends Component {
                                 this.setState({ emails: _emails });
                             }}
                             validateEmail={email => {
+                                if (isEmail(email) == false) {
+                                    alert('Invalid email');
+                                }
                                 return isEmail(email); // return boolean
                             }}
                             getLabel={(

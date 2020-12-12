@@ -16,9 +16,3 @@ export const AuthProvider = ({children})=> {
         </AuthContext.Provider>
     );
 };
-/*db.auth().onAuthStateChanged(function(user) {
-    if (user) {
-        var uid = user.uid;
-        this.firebaseRef.child(uid).set({ name,age });
-    }
-});*/

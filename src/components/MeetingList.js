@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import db from '../base';
 import { Redirect } from "react-router-dom";
-import "../style.css";
+import "../style.css"
 
 class MeetingList extends Component {
     constructor(props) {
@@ -42,20 +42,12 @@ class MeetingList extends Component {
         this.firebaseRef.on('value', snapshot => {
 
             if (snapshot.val() != null && snapshot.child("meetingIDs").val() != null) {
-                //console.log("id")
-                //console.log(snapshot.child("meetingIDs").val())
                 this.setState({
                     meetingIDs: snapshot.child("meetingIDs").val(),
                 });
                 this.fetchData(this.state.meetingIDs);
-                //console.log(this.state.meetingIDs)
-                //return this.state.meetingIDs
             }
-            //console.log(snapshot.child("meetingIDs").val())
         });
-
-        //return;
-
     }
 
     fetchData(meetingIDs){
@@ -66,12 +58,8 @@ class MeetingList extends Component {
         this.firebaseRef_M.on('value', snapshot => {
             for(const id of meetingIDs){
                 if (snapshot.val() != null && snapshot.child(id).val() != null) {
-                    //console.log("fetch")
-                    //console.log(snapshot.child("meetingIDs").val())
                     meetingNames.push(snapshot.child(id).child("meetingName").val())
                     decidedM.push(snapshot.child(id).child("decided").val())
-                    //console.log(this.state.meetingIDs)
-                    //return this.state.meetingIDs
                 }
             }
             if(decidedM.length !== 0){
@@ -80,8 +68,6 @@ class MeetingList extends Component {
                     decidedM: decidedM,
                 });
             }
-
-            //console.log(snapshot.child("meetingIDs").val())
         });
 
 

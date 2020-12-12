@@ -12,16 +12,29 @@ class MasterCalendar extends Component {
             endTime: this.props.endTime,
             availabilities: [],
             bestTimes: [],
-            index: 0
+            index: 0,
+            nameIDs: [],
+            creatorID: this.props.creatorID
         }
         this.firebaseRef = db.database().ref("availability/"+this.state.meetingID);
+        this.firebaseUsersRef = db.database().ref("UserInfo");
+        this.firebaseMeetingsRef = db.database().ref("meetings/"+this.state.meetingID);
+
         this.hover = this.hover.bind(this);
         this.toggle = this.toggle.bind(this);
+        this.updateUsers = this.updateUsers.bind(this);
     }
     componentWillUnmount() {
         this.firebaseRef.off();
+        this.firebaseUsersRef.off();
+        this.firebaseMeetingsRef.off();
     }
     componentDidMount() {
+        this.firebaseMeetingsRef.on('value', (snapshot) => {
+            //get names and emails of users
+            this.updateUsers(snapshot.val().userIDs);
+        });
+
         this.firebaseRef.on('value', (snapshot)=> {
             let avaArray = {};
             if (snapshot.val() != null) {
@@ -63,21 +76,38 @@ class MasterCalendar extends Component {
             }
         })
     }
+    updateUsers(userIDs){
+        this.firebaseUsersRef.on('value', (snapshot)=>{
+            const {nameIDs} = this.state;
+            if (userIDs != null) {
+                for (const id of userIDs){
+                    if (id in snapshot.val()){
+                        const name = snapshot.child(id).child("name").val();
+                        nameIDs[id] = name;
+                    }
+                }
+            }
+            nameIDs[this.state.creatorID] = snapshot.child(this.state.creatorID).child("name").val();
+            this.setState({nameIDs: nameIDs});
+        });
+    }
     convertTo12Hr(hour) {
         hour = Number(hour);
         var AMPM = (hour < 12) ? " AM" : (hour == 24) ? " AM" : " PM";
         var h = (hour % 12) || 12;
         return h + AMPM;
     }
-    hover(event){
-        let key = event.target.getAttribute('id');
-        const {availabilities} = this.state;
-        //console.log(key);
-        //console.log(availabilities);
+    hover(key) {
+        const {availabilities, nameIDs} = this.state;
+        let allNames = "";
         if (key in availabilities){
-           alert(availabilities[key]["users"] + ": " + availabilities[key]["priority"]);
+            let userID = availabilities[key]["users"];
+            for (const id of userID) {
+                allNames += nameIDs[id] + "\n";
+            }
+            return allNames;
         }
-
+        return "No selections";
     }
     toggle(event){
         let direction = event.target.getAttribute('id');
@@ -102,7 +132,7 @@ class MasterCalendar extends Component {
         for (const eachday of this.state.meetingDays){
             let slot = [];
             Array.from({length: windowLength}, (_, i) =>{
-                slot.push(<div id ={(i+time)+'-'+eachday} style={{backgroundColor: this.state.color}} onClick={this.hover}></div>);
+            slot.push(<div className="tooltip" id ={(i+time)+'-'+eachday} style={{backgroundColor: this.state.color}}><span className="tooltiptext">{Object.keys(this.state.nameIDs).length !== 0 && this.hover((i+time)+'-'+eachday)}</span></div>);
             });
             slotsM[eachday] = slot;
         }
@@ -111,18 +141,12 @@ class MasterCalendar extends Component {
         }
 
         if (Object.keys(this.state.availabilities).length !== 0 && daysM.length !== 0 && Object.keys(slotsM).length !== 0) {
-            var lowest = Number.MAX_SAFE_INTEGER;
-            var highest = 0;
+            var highest = 1;
             // loop to get lowest and highest selections from calendar
-            for (const [key, value] of Object.entries(this.state.availabilities)) {
+            for (const [key,value] of Object.entries(this.state.availabilities)) {
                 let priority = value.priority;
-                if (priority > -1) {
-                    if (priority < lowest) {
-                        lowest = priority;
-                    }
-                    if (priority > highest) {
-                        highest = priority;
-                    }
+                if (priority > highest) {
+                    highest = priority;
                 }
             }
             // loop again to color timeslots accordingly
@@ -130,15 +154,15 @@ class MasterCalendar extends Component {
                 let hour = key.split("-")[0];
                 let day = key.split("-")[1];
                 let priority = value.priority;
-                // darkest color is rgb(50,50,50), lightest is rgb(200,200,200), range=150
-                let color;
-                if (highest === lowest) {
-                    color = 'rgb(0,200,0)';
-                } else {
-                    let stepsize = 150 / (highest - lowest);
-                    let rgbVal = 200 - (stepsize * (priority - lowest));
-                    color = `rgb(${0.5*rgbVal}, ${0.9*rgbVal}, ${0.5*rgbVal})`;
-                }
+                // darkest color is rgb(10,60,25), lightest is rgb(150, 220, 180)
+                // Red range = 140, Green range = 160, Blue range = 155
+                let redStepsize = 140/highest;
+                let greenStepsize = 160/highest;
+                let blueStepsize = 155/highest;
+                let rVal = 150 - (redStepsize * priority);
+                let gVal = 220 - (greenStepsize * priority);
+                let bVal = 180 - (blueStepsize * priority);
+                let color = `rgb(${rVal}, ${gVal}, ${bVal})`;
                 // assign color
                 let slot = daysM.find(x => x.props.id === day).props.children[1].props.children.find(x => x.props.id.split('-')[0] === hour);
                 slot.props.style.backgroundColor = color;

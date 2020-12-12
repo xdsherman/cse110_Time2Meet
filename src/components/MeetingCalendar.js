@@ -4,7 +4,6 @@ import "../style.css";
 import { Redirect } from "react-router-dom";
 import Invite from "./Invite";
 import MasterCalendar from "./MasterCalendar";
-import TabularView from "./TabularView";
 
 class MeetingCalendar extends Component {
     constructor(props) {
@@ -35,12 +34,10 @@ class MeetingCalendar extends Component {
         this.changePriority = this.changePriority.bind(this);
         this.toggle = this.toggle.bind(this);
         this.convertTo12Hr = this.convertTo12Hr.bind(this);
-        //this.checkData = this.checkData.bind(this);
     }
 
     componentDidMount() {
         this.firebaseRef = db.database().ref("availability/"+this.state.meetingID+"/"+this.state.userID);
-        //console.log(this.firebaseRef);
         // Get the availabilities at start up
         this.firebaseRef.once('value').then((snapshot) => {
             if (snapshot.val() != null && snapshot.child("availability").val()!=null) {
@@ -52,7 +49,6 @@ class MeetingCalendar extends Component {
 
         //retrieve data of meeting
         this.firebaseRef_M = db.database().ref("meetings");
-        //console.log(this.firebaseRef);
 
         this.firebaseRef_M.on('value', snapshot => {
             if (snapshot.val() != null && snapshot.child(this.state.meetingID).val() != null) {
@@ -130,8 +126,6 @@ class MeetingCalendar extends Component {
                     included = true
                     availability.splice(index, 1);
                     if(value.priority != priorityVal){
-                        //console.log(value.priority)
-                        //console.log(priorityVal)
                         availability.push(ava.props);
                     }
                 }
@@ -145,7 +139,6 @@ class MeetingCalendar extends Component {
 
     changePriority(event){
         let priority = event.target.getAttribute('id');
-        //console.log(priority);
         if(priority == 1)
             this.setState({
                 priority: 1
@@ -158,7 +151,6 @@ class MeetingCalendar extends Component {
             this.setState({
                 priority: 3
             });
-        //console.log(this.state.priority);
     }
 
     handleCreate(event){
@@ -209,10 +201,7 @@ class MeetingCalendar extends Component {
                     color = '#77c6e0'
                 else
                     color = '#009fd4'
-                //console.log(day,hour);
-                //console.log(days.find(x => x.props.id === day).props.children[1]);
                 // Change color by getting the day column, then hour column to reach in the individual slot
-                //days.find(x => x.props.id === day).props.children[1].props.children.find(x => x.props.id === hour).props.style.backgroundColor = color;
                 days.find(x => x.props.id === day).props.children[1].props.children.find(x => x.props.id.split('-')[0] === hour).props.style.backgroundColor = color;
             }
         }
@@ -224,7 +213,8 @@ class MeetingCalendar extends Component {
             <div>
             <div className="flex-container">
                 <div className="changePriority">
-                    <p>Meeting Name:{this.state.meetingName}</p>
+                    <h1>Personal Calendar</h1>
+                    <p>Meeting Name: <br /> {this.state.meetingName}</p>
                     <p> Mark your preferences</p>
                     <button className="changePriority_2" id={3} onClick={this.changePriority}>High</button>
                     <button className="changePriority_1" id={2} onClick={this.changePriority}>Middle</button>
@@ -245,12 +235,14 @@ class MeetingCalendar extends Component {
                     </div> : 
                 this.state.decided ? <p className="listObject">This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}.</p>
                 : null}
+                <h1>Master Calendar</h1>
                 {this.state.meetingDays ?
                     <div><MasterCalendar
                         meetingID = {this.state.meetingID}
                         meetingDays = {this.state.meetingDays}
                         startTime = {this.state.startTime}
                         endTime = {this.state.endTime}
+                        creatorID = {this.state.creatorID}
                     /></div>
                     : null}
 

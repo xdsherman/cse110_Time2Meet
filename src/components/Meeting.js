@@ -2,10 +2,7 @@ import React, {Component} from 'react';
 import db from '../base';
 import DayPicker, { DateUtils } from 'react-day-picker';
 import "../style.css";
-//import 'react-day-picker/lib/style.css';
-//https://react-day-picker.js.org/examples/selected-multiple/
 import { Redirect } from "react-router-dom";
-import Invite from "./Invite";
 
 class Meeting extends Component {
     constructor(props) {
@@ -20,7 +17,7 @@ class Meeting extends Component {
             setDate: '',
             setTime: '',
             startTime: 9,
-            endTime: 24,
+            endTime: 17,
             meetingDays: [],
             decided: false,
             decidedM: this.props.location.state.decidedM,
@@ -28,8 +25,6 @@ class Meeting extends Component {
             showT: false
         };
 
-
-        //console.log(this.state.meetingIDs);
         this.handleDayClick = this.handleDayClick.bind(this);
         this.pushToFirebase = this.pushToFirebase.bind(this);
         this.redirectHome = this.redirectHome.bind(this);
@@ -64,12 +59,10 @@ class Meeting extends Component {
             meetingDays.push(day);
         }
         this.setState({ meetingDays});
-        //console.log(meetingDays);
     }
 
     handleWeekClick = (weekNumber, days, e) => {
         const { meetingDays } = this.state;
-        //console.log(weekNumber)
         let weekIncluded = true;
         let included = [];
 
@@ -99,7 +92,6 @@ class Meeting extends Component {
         }
 
         this.setState({ meetingDays});
-        //console.log(this.state.meetingDays)
     };
 
     handleMenu(event){
@@ -123,13 +115,9 @@ class Meeting extends Component {
         let id = Number(event.target.getAttribute('id'));
         let parent = event.target.parentElement.getAttribute('id');
 
-        //console.log(startTime)
-        //console.log(endTime)
-        //console.log(id)
-        //console.log(parent)
         if(parent == 0){
             if(id >= endTime){
-                alert("???Your meeting window end time is earlier than start time")
+                alert("Your meeting window start time is later than the end time")
             }else{
                 this.setState({
                     startTime: id,
@@ -138,7 +126,7 @@ class Meeting extends Component {
 
         }else{
             if(startTime >= id){
-                alert("///Your meeting window end time is earlier than start time")
+                alert("Your meeting window end time is earlier than the start time")
             }else{
                 this.setState({
                     endTime: id,
@@ -171,14 +159,13 @@ class Meeting extends Component {
             alert("You must pick at least one day");
             return;
         }
-        if(meetingName == null){
+        if(meetingName.length == 0){
             alert("You must enter a meeting name");
             return;
         }
         for (const [index, value] of meetingDays.entries()) {
             meetingDays[index] = meetingDays[index].toLocaleDateString();
         }
-        //sort meetingDays
         //sort meetingDays
         meetingDays.sort(function (a,b) {
             a = a.split('/').reverse();
@@ -247,7 +234,6 @@ class Meeting extends Component {
         let AM = []
         let PM = []
         Array.from({length: 24}, (_, i) => AM.push(<div className="dropdown-button" id = {i+1} onClick={this.setWindow}>{this.convertTo12Hr(i+1)}</div>));
-        //Array.from({length: 12}, (_, i) => PM.push(<button id = {i+13} onClick={this.setWindow}>{i+1}PM</button>));
 
         return(
             <div className = "select">

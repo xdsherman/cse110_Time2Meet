@@ -9,7 +9,10 @@ const ForgotPassword = ({ history }) => {
 		event.preventDefault();
 		const { email } = event.target.elements;
 		try {
-			db.auth().sendPasswordResetEmail(email.value);
+			db.auth().sendPasswordResetEmail(email.value).catch(function(error) {
+				alert(error["message"]);
+				history.push("/forgotpassword");
+            });
 			history.push("/");
 		} catch (error) {
 			alert(error);
@@ -21,28 +24,12 @@ const ForgotPassword = ({ history }) => {
 	};
 
 	return (
-		/*
-        <div className="centered">
-            <h1>Forgot Password</h1>
-            <form onSubmit={handleForgotPassword}>
-                <label>
-                    Email
-                    <input name="email" type="email" placeholder="Enter Email" />
-                </label>
-                <button type="submit" > Send Email</button>
-            </form>
-
-            <button onClick={redirectLogIn}>Log In</button>
-        </div>
-        */
-
-		<form className="login">
+		<form className="login" onSubmit={handleForgotPassword}>
 			<img src={logo} alt=""></img>
 			<input type="text" name="email" placeholder="user email" />
 			<input
 				type="submit"
-				value="Send Password"
-				onClick={handleForgotPassword}
+				value="Reset Password"
 			></input>
 			<div className="link" onClick={redirectLogIn}>
 				Go back to log in
