@@ -30,4 +30,4 @@ If a person who does not have an account yet receives an invitation, once they c
 6. Interact with the master calendar to see every participants' responses.
 7. Once you receive your participants' selections, as the meeting creator, you may finalize the meeting time by selecting one of the suggested times in the suggestions table.
 8. When the meeting date and time is set, participants may no longer edit their personal calendars.
-All participants will also receive an email notification containing the meetings finalized time.
+All participants will also receive an email notification containing the meeting's finalized time.
