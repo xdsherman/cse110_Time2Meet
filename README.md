@@ -1,20 +1,20 @@
 # Time2Meet
-UCSD CSE110 Fall 2020 Project\
-Brought to you buy the Programmers of Gary (POG)
+UCSD CSE110 Fall 2020 Project<br/>
+Brought to you buy the Programmers of Gary (POG)<br/>
 Hosted at [time2meet-d3731.web.app](https://time2meet-d3731.web.app/)<br/>
 [Project video](https://www.youtube.com/watch?v=PtrAXuKBUz8&feature=youtu.be)
 
 ## Programmers of Gary (POG)
-Calvin Chen - Project Manager/
-Xinyi Guo - Software Development Lead/
-Htet "Tim" Yan Oo - Algorithm Specialist/
-Fanqi Lin - Quality Assurance Lead/
-Shouxian "Shawn" Hu - Software Architect/
-Edwin Wang - UI Specialist/
-Jake Song - UI Specialist/
-Sheung Ho - Database Specialist/
-Xiande "Martin" Zeng - Database Specialist/
-Moiz Muhammad - Business Analyst/
+Calvin Chen - Project Manager<br/>
+Xinyi Guo - Software Development Lead<br/>
+Htet "Tim" Yan Oo - Algorithm Specialist<br/>
+Fanqi Lin - Quality Assurance Lead<br/>
+Shouxian "Shawn" Hu - Software Architect<br/>
+Edwin Wang - UI Specialist<br/>
+Jake Song - UI Specialist<br/>
+Sheung Ho - Database Specialist<br/>
+Xiande "Martin" Zeng - Database Specialist<br/>
+Moiz Muhammad - Business Analyst<br/>
 Yifu Fang - Senior System Analyst
 
 ## Guide
