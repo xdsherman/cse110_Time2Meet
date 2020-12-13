@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import db from '../base';
 import { Redirect } from "react-router-dom";
 import "../style.css"
+import logo from "../routes/resource/time2meet_logo.png";
 
 class MeetingList extends Component {
     constructor(props) {
@@ -110,40 +111,50 @@ class MeetingList extends Component {
     }
 
     render() {
-        let futureMeeting = []
-        let pastMeeting = []
-        if(this.state.decidedM.length !== 0 && this.state.meetingNames.length !== 0){
-            for (const id in this.state.meetingIDs){
-                if(this.state.decidedM[id]){
-                    pastMeeting.push(<div key = {id} id = {this.state.meetingIDs[id]}>{this.state.meetingNames[id]}<button className="viewButton" onClick={this.clickMeeting}>View Meeting</button></div>);
-                }else{
-                    futureMeeting.push(<div key = {id} id = {this.state.meetingIDs[id]}>{this.state.meetingNames[id]}<button className="viewButton" onClick={this.clickMeeting}>View Meeting</button></div>);
-                }
-            }
-        }
+        let futureMeeting = [];
+		let pastMeeting = [];
+		if (this.state.decidedM.length !== 0 && this.state.meetingNames.length !== 0) {
+			for (const id in this.state.meetingIDs) {
+				if (this.state.decidedM[id]) {
+					pastMeeting.push(
+						<div key={id} id={this.state.meetingIDs[id]} className="meetingList_meeting_item">
+							{this.state.meetingNames[id]}
+							<button className="meetingList_flat_btn" onClick={this.clickMeeting}>
+								View Meeting
+							</button>
+						</div>
+					);
+				} else {
+					futureMeeting.push(
+						<div key={id} id={this.state.meetingIDs[id]} className="meetingList_meeting_item">
+							{this.state.meetingNames[id]}
+							<button className="meetingList_flat_btn" onClick={this.clickMeeting}>
+								View Meeting
+							</button>
+						</div>
+					);
+				}
+			}
+		}
 
         return (
-            <div>
-                <h1 className="appName">Time2Meet</h1>
-                <div className="flex-container">
-                    <div className="homePage"><div className="meetingList">
-                        <label className="listLabel">Current Meetings</label>
-                        <div className="listObject">
-                            {futureMeeting.length ? futureMeeting : <p>No Current Meeting</p>}
-                        </div>
-                        <label className="listLabelP">Planned Meetings</label>
-                        <div className="listObjectP">
-                            {pastMeeting.length ? pastMeeting : <p>No Planned Meeting</p>}
-                        </div>
-                    </div>
-                    <div>
-                        <button className="float-left" onClick={this.createMeeting}>Create Meeting</button>
-                        <button className="float-right" onClick={() => db.auth().signOut()}>Sign Out</button>
-                    </div>
-                    </div>
-                </div>
-            </div>
-        );
+			<div>
+				<div className="meetingList_container">
+					<img src={logo} alt=""></img>
+					<div>
+						<h2 className="meetingList_h2">Current Meetings</h2>
+						<div>{futureMeeting.length ? futureMeeting : <p className="no_meetings">No Current Meetings</p>}</div>
+						<h2 className="meetingList_h2">Planned Meetings</h2>
+						<div>{pastMeeting.length ? pastMeeting : <p className="no_meetings">No Planned Meetings</p>}</div>
+					</div>
+					<br />
+					<div>
+						<button className="meetingList_float_left_btn" onClick={this.createMeeting}>Create Meeting</button>
+						<button className="meetingList_float_right_btn" onClick={() => db.auth().signOut()}>Sign Out</button>
+					</div>
+				</div>
+			</div>
+		);
     }
 }
 

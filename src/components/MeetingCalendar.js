@@ -187,9 +187,7 @@ class MeetingCalendar extends Component {
         if(this.state.meetingDays.length != 0){
             days = this.state.meetingDays.map(day => <div id = {day}><div className="day">{day}</div><div id={day} className= "slots">{slots[day]}</div></div>);
         }
-
-
-
+        
         if (Object.keys(this.state.availability).length !== 0 && days.length !== 0) {
             for (const value of Object.values(this.state.availability)) {
                 let day = value.day;
@@ -210,44 +208,63 @@ class MeetingCalendar extends Component {
         daysOut.push(days.slice(this.state.index*7, this.state.index*7+7));
 
         return (
-            <div>
-            <div className="flex-container">
-                <div className="changePriority">
-                    <h1>Personal Calendar</h1>
-                    <p>Meeting Name: <br /> {this.state.meetingName}</p>
-                    <p> Mark your preferences</p>
-                    <button className="changePriority_2" id={3} onClick={this.changePriority}>High</button>
-                    <button className="changePriority_1" id={2} onClick={this.changePriority}>Middle</button>
-                    <button className="changePriority_0" id={1} onClick={this.changePriority}>Low</button>
-                </div>
-                {this.state.index !== 0 && <button id = 'prev' onClick = {this.toggle}>Previous</button>}
-                {hours.length ? <div className="hours">{hours}</div> : null}{daysOut}
-                {this.state.index !== Math.floor(this.state.meetingDays.length/8) && <button id = 'next' onClick = {this.toggle}>Next</button>}
-            </div>
-                <button className="save" onClick={this.pushToFirebase}>{this.state.edit ? 'Save' : 'Edit'}</button>
-                <button className="create" onClick={this.handleHome}>Home</button>
-                {this.state.userID == this.state.creatorID ?
-                    <div>
-                        <Invite creatorID={this.state.creatorID}
-                                meetingID={this.state.meetingID}
-                                meetingName={this.state.meetingName}
-                                showI={this.state.decided}/>
-                    </div> : 
-                this.state.decided ? <p className="listObject">This meeting has been scheduled for {this.state.setDate} at {this.state.setTime}.</p>
-                : null}
-                <h1>Master Calendar</h1>
-                {this.state.meetingDays ?
-                    <div><MasterCalendar
-                        meetingID = {this.state.meetingID}
-                        meetingDays = {this.state.meetingDays}
-                        startTime = {this.state.startTime}
-                        endTime = {this.state.endTime}
-                        creatorID = {this.state.creatorID}
-                    /></div>
-                    : null}
-
-            </div>
-        );
+			<div className="meetingCalendar_container">
+				<div className="flex-container">
+					<div className="changePriority">
+						<h1>Personal Calendar</h1>
+						<p>Meeting Name: <br /> {this.state.meetingName}</p>
+						<p> Mark your preferences</p>
+						<div className="meetingCalendar_btn_container">
+							<button className="changePriority_0" id={1} onClick={this.changePriority}>Low</button>
+							<button className="changePriority_1" id={2} onClick={this.changePriority}>Middle</button>
+							<button className="changePriority_2" id={3} onClick={this.changePriority}>High</button>
+						</div>
+					</div>
+					{this.state.index !== 0 && (
+						<button id="prev" onClick={this.toggle}>Previous</button>
+					)}
+					{hours.length ? <div className="hours">{hours}</div> : null}
+					{daysOut}
+					{this.state.index !==
+						Math.floor(this.state.meetingDays.length / 8) && (
+						<button id="next" onClick={this.toggle}>Next</button>
+					)}
+				</div>
+				<button className="meetingCalendar_btn" onClick={this.pushToFirebase}>
+					{this.state.edit ? "Save" : "Edit"}
+				</button>
+				<button className="meetingCalendar_btn" onClick={this.handleHome}>
+					Home
+				</button>
+				{this.state.userID == this.state.creatorID ? (
+					<div>
+						<Invite
+							creatorID={this.state.creatorID}
+							meetingID={this.state.meetingID}
+							meetingName={this.state.meetingName}
+							showI={this.state.decided}
+						/>
+					</div>
+				) : this.state.decided ? (
+					<p className="scheduled_message">
+						This meeting has been scheduled for {this.state.setDate} at{" "}
+						{this.state.setTime}.
+					</p>
+				) : null}
+				<h1 className="meetingCalendar_h1">Master Calendar</h1>
+				{this.state.meetingDays ? (
+					<div>
+						<MasterCalendar
+							meetingID={this.state.meetingID}
+							meetingDays={this.state.meetingDays}
+							startTime={this.state.startTime}
+							endTime={this.state.endTime}
+							creatorID={this.state.creatorID}
+						/>
+					</div>
+				) : null}
+			</div>
+		);
     }
 }
 

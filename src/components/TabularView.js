@@ -142,9 +142,9 @@ class TabularView extends Component {
             if (this.state.bestTimes[0] != null) {
                 if (db.auth().currentUser.uid === this.state.creatorID) {
                     meeting1 = 
-                        <li>
+                        <li className="tabular_list_item">
                             {this.state.bestTimes[0]}
-                            <button onClick={() => this.sendEmail(this.state.bestTimes[0])}>
+                            <button className="meetingList_flat_btn" onClick={() => this.sendEmail(this.state.bestTimes[0])}>
                                 Set Meeting and Email Participants
                             </button>
                         </li>;
@@ -157,9 +157,9 @@ class TabularView extends Component {
             if (this.state.bestTimes[1] != null) {
                 if (db.auth().currentUser.uid === this.state.creatorID) {
                     meeting2 = 
-                        <li>
+                        <li className="tabular_list_item">
                             {this.state.bestTimes[1]}
-                            <button onClick={() => this.sendEmail(this.state.bestTimes[1])}>
+                            <button className="meetingList_flat_btn" onClick={() => this.sendEmail(this.state.bestTimes[1])}>
                                 Set Meeting and Email Participants
                             </button>
                         </li>;
@@ -172,9 +172,9 @@ class TabularView extends Component {
             if (this.state.bestTimes[2] != null) {
                 if (db.auth().currentUser.uid === this.state.creatorID) {
                     meeting3 = 
-                        <li>
+                        <li className="tabular_list_item">
                             {this.state.bestTimes[2]}
-                            <button onClick={() => this.sendEmail(this.state.bestTimes[2])}>
+                            <button className="meetingList_flat_btn" onClick={() => this.sendEmail(this.state.bestTimes[2])}>
                                 Set Meeting and Email Participants
                             </button>
                         </li>;
@@ -187,17 +187,17 @@ class TabularView extends Component {
         }
 
         return (
-            <div className="tabularView">
-                <h2>Suggested Meeting Times</h2>
-                <div id="suggestionsTable">
-                    <ul>
-                        {meeting1}
-                        {meeting2}
-                        {meeting3}
-                    </ul>
-                </div>
-            </div>
-        );
+			<div className="tabularView">
+				<h2>Suggested Meeting Times</h2>
+				<div id="suggestionsTable">
+					<ul className="tabularview_list">
+						{meeting1}
+						{meeting2}
+						{meeting3}
+					</ul>
+				</div>
+			</div>
+		);
     }
 }
 

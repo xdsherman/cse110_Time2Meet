@@ -41,9 +41,6 @@ const SignUp = ({ history }) => {
                             //meetingID[0] is the meeting id
                             //meetingID[1] is the array of {'ivEmail' : ...}
                             //meetingID[1].invEmail is the array of emails
-                            //console.log(meetingID[0])
-                            //console.log(meetingID[1])
-                            //console.log(meetingID[1].invEmail)
                             const isEmail = (element) => element == db.auth().currentUser.email;
                             const index = meetingID[1].invEmail.findIndex(isEmail);
                             if(index !== -1){
@@ -54,18 +51,13 @@ const SignUp = ({ history }) => {
                                             userIDs= snapshot.child(meetingID[0]).child("userIDs").val();
                                         }
                                     }
-                                    //console.log("current");
-                                    //console.log(userIDs);
                                     userIDs.push(db.auth().currentUser.uid);
                                     db.database().ref("meetings").child(meetingID[0]).update({userIDs});
                                 })
-                                //console.log(invitations[id])
                                 datasnapshot[meetingID[0]].invEmail.splice(index, 1);
-                                //invitations[id][1].invEmail.splice(index, 1);
                             }
                         }
 
-                        //console.log(invitations.values())
                         db.database().ref("UserInfo/").update({invitations: datasnapshot});
                         db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
                     }

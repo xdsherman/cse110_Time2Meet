@@ -230,43 +230,64 @@ class Meeting extends Component {
         return <Redirect to="/" />;
     }
 
-    render(){
-        let AM = []
-        let PM = []
-        Array.from({length: 24}, (_, i) => AM.push(<div className="dropdown-button" id = {i+1} onClick={this.setWindow}>{this.convertTo12Hr(i+1)}</div>));
+    render() {
+		let AM = [];
+		let PM = [];
+		Array.from({ length: 24 }, (_, i) =>
+			AM.push(
+				<div className="dropdown-button" id={i + 1} onClick={this.setWindow}>
+					{this.convertTo12Hr(i + 1)}
+				</div>
+			)
+		);
 
-        return(
-            <div className = "select">
-                <label className="listObject">Select Meeting Days</label>
-                <div><DayPicker
-                    showWeekNumbers
-                    selectedDays={this.state.meetingDays}
-                    onDayClick={this.handleDayClick}
-                    onWeekClick={this.handleWeekClick}
-                /></div>
+		return (
+			<div className="meeting_container">
+				<h2 className="meeting_h2"> Select Meeting Days</h2>
+				<div>
+					<DayPicker
+						showWeekNumbers
+						selectedDays={this.state.meetingDays}
+						onDayClick={this.handleDayClick}
+						onWeekClick={this.handleWeekClick}
+					/>
+				</div>
 
-                <div className="dropdown" >
-                    <button className="dropbtn">From: {this.convertTo12Hr(this.state.startTime)}</button>
-                    <div className="dropdown-content" id = {0}>{AM}{PM}</div>
-                </div>
-                <div className="dropdown" >
-                    <button className="dropbtn">To: {this.convertTo12Hr(this.state.endTime)}</button>
-                    <div className="dropdown-content" id = {1}>{AM}{PM}</div>
-                </div>
-                <br />
-                <div>
-                    <label className="listObject">What is the name of this meeting?</label>
-                    <input onChange= {e =>this.setState({meetingName : e.target.value})} />
-                </div>
+				<br />
 
-                <button onClick={this.pushToFirebase}>Create Meeting</button>
-                <button onClick={this.redirectHome}>Cancel</button>
-            </div>
-        );
+				<div className="dropdown">
+					<button className="dropbtn">
+						From: {this.convertTo12Hr(this.state.startTime)}
+					</button>
+					<div className="dropdown-content" id={0}>{AM}{PM}</div>
+				</div>
+				<div className="dropdown">
+					<button className="dropbtn">
+						To: {this.convertTo12Hr(this.state.endTime)}
+					</button>
+					<div className="dropdown-content" id={1}>{AM}{PM}</div>
+				</div>
+				<br />
+				<br />
+				<div>
+					<label className="listObject">
+						What is the name of this meeting?
+					</label>
+					<input
+						onChange={(e) => this.setState({ meetingName: e.target.value })}
+						className="meeting_input"
+					/>
+				</div>
+
+				<button onClick={this.pushToFirebase} className="meeting_btn">
+					Create Meeting
+				</button>
+				<button onClick={this.redirectHome} className="meeting_btn">
+					Cancel
+				</button>
+			</div>
+		);
     }
-
-
-
 }
 
 export default Meeting;

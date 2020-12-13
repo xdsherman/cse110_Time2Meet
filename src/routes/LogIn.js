@@ -74,7 +74,6 @@ const Login = ({history}) => {
                             }
                         }
 
-                        //console.log(invitations.values())
                         db.database().ref("UserInfo/").update({invitations: datasnapshot});
                         db.database().ref("UserInfo/"+db.auth().currentUser.uid).update({meetingIDs});
                     }
