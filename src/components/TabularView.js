@@ -52,6 +52,7 @@ class TabularView extends Component {
         // calculate top 3 times
         this.firebaseAvailabilitiesRef.on('value', (snapshot)=> {
             let avaArray = {};
+            let bestTimes = [];
             if (snapshot.val() != null) {
                 for (const [user,ava] of Object.entries(snapshot.val())) {
                     for (const each of Object.values(ava.availability)) {
@@ -74,14 +75,13 @@ class TabularView extends Component {
                     return b[1] - a[1];
                 });
                 sortable = sortable.slice(0, 3);
-                var bestTimes = [];
                 for (let key in sortable) {
                     bestTimes.push(sortable[key][0]);
                 }
-                this.setState({
-                    bestTimes: bestTimes
-                })
             }
+            this.setState({
+                bestTimes: bestTimes
+            })
         });
     }
 
